@@ -1,0 +1,32 @@
+# 🎟️ NC Plus One
+NC Plus One is a backend project for an events platform. Its goal is to build a REST API that allows users to discover events, RSVP and manage their attendance, while giving organisers tools to create events and understand their audience.
+
+## Planned features
+### Attendees
+- Register an account.
+- Browse available events.
+- RSVP to events.
+- Manage their attendance.
+
+### Organisers
+- Create and manage events.
+- View audience and attendance statistics.
+
+## Architecture
+The API forms the backend layer of a full stack application:
+
+```text
+Client / frontend ⇄ REST API ⇄ Database
+```
+
+It will receive HTTP requests, apply business logic, communicate with the database and return structured JSON responses. Authentication, data integrity and application rules are central responsibilities of the API.
+
+A frontend is outside this project's scope. The API will be designed with frontend developers in mind, using clear endpoints, predictable responses and appropriate HTTP status codes.
+
+## Engineering approach
+- **Version control:** regular commits with clear, descriptive messages.
+- **Configuration:** environment variables for credentials and settings, with local secrets excluded from Git.
+- **Testing:** integration tests for each endpoint's successful behaviour and documented error cases, plus unit tests for data transformation utilities.
+- **Error handling:** consistent error responses and appropriate HTTP status codes.
+- **Documentation:** setup instructions and API usage examples added as the implementation develops.
+

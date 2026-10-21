@@ -1,4 +1,6 @@
 # 🎟️ NC Plus One
+
+## PART 1 - OVERVIEW
 NC Plus One is a backend project for an events platform. Its goal is to build a REST API that allows users to discover events, RSVP and manage their attendance, while giving organisers tools to create events and understand their audience.
 
 ## Planned features
@@ -30,3 +32,23 @@ A frontend is outside this project's scope. The API will be designed with fronte
 - **Error handling:** consistent error responses and appropriate HTTP status codes.
 - **Documentation:** setup instructions and API usage examples added as the implementation develops.
 
+## PART 2 - Create and connect to a database by running setup.sql
+
+**RUN FILE**
+```bash
+psql -d postgres -f db/setup.sql
+```
+
+You should see if database does not exist:
+```text
+psql:db/setup.sql:2: NOTICE:  database "nc_plus_one" does not exist, skipping DROP DATABASE
+CREATE DATABASE
+You are now connected to database "nc_plus_one" as user "your_name".
+```
+
+OR you should see if database does exist:
+```text
+DROP DATABASE
+CREATE DATABASE
+You are now connected to database "nc_plus_one" as user "your_name".
+```

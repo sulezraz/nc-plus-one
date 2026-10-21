@@ -52,3 +52,18 @@ DROP DATABASE
 CREATE DATABASE
 You are now connected to database "nc_plus_one" as user "your_name".
 ```
+
+## PART 3 - ERD (Entity Relationship Diagram)
+- 4 tables: 
+    3 main tables:
+        Users, Venues, Events
+        connections: 
+            users.user_id = events.organiser_id
+            venues.venue_id = events.venue_id
+    1 connecting table: 
+        Rsvps - connects Users and Events table.
+                users.user_id = rsvps.attendee_id
+                events.event_id = rsvps.event_id
+
+
+

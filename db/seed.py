@@ -1,10 +1,26 @@
-def seed():
-    """
-    Rests to a fixed starting point before each test run:
-    *Removing any data from previous runs
-    *Rebuilding the table schemas
-    *Inserting the test data
-    """
-    pass
+# seed.py
+from load_json import convert_tuple, load_json
 
-# TODO:  break the implementation across several smaller functions rather than handling everything in one place
+
+def insert_users_table(conn):
+    # Load the JSON records and convert them into tuples.
+    users = convert_tuple(load_json())
+
+    # Create a cursor to execute SQL.
+    cursor = conn.cursor()
+
+    # Insert each tuple in name, email, password order.
+    cursor.executemany(
+        """
+        INSERT INTO users (name, email, password)
+        VALUES (%s, %s, %s);
+        """,
+        users,
+    )
+    print("INSERT complete.")
+
+    # Save the transaction's changes.
+    conn.commit()
+
+    # Release the cursor; the connection remains open.
+    cursor.close()

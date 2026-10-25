@@ -1,17 +1,17 @@
-# seed.py
-from load_json import convert_tuple, load_json
+# seed_users.py
+from db.load_json import convert_tuple, load_json
 
 
 def insert_users_table(conn):
-    # Load the JSON records and convert them into tuples.
-    users = convert_tuple(load_json())
+    # Load users.json and convert each record into a tuple.
+    users = convert_tuple(load_json("users.json"))
 
-    # Create a cursor to execute SQL.
+    # Create a cursor using the supplied connection.
     cursor = conn.cursor()
 
     # Insert each tuple in name, email, password order.
     cursor.executemany(
-        """
+        """--sql
         INSERT INTO users (name, email, password)
         VALUES (%s, %s, %s);
         """,

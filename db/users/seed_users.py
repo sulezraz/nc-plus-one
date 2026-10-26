@@ -9,10 +9,10 @@ def insert_users_table(conn):
     # Create a cursor using the supplied connection.
     cursor = conn.cursor()
 
-    # Insert each tuple in name, email, password order.
+    # Insert each tuple in username, email, user password order.
     cursor.executemany(
         """--sql
-        INSERT INTO users (name, email, password)
+        INSERT INTO users (username, email, user_password)
         VALUES (%s, %s, %s);
         """,
         users,

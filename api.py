@@ -25,13 +25,13 @@ def get_all_users():
     columns = [desc[0] for desc in cur.description]
     rows = cur.fetchall()  # Retrieve all matching rows as a list of tuples.
 
-    # Release the database resources after fetching the data.
-    cur.close()
-    conn.close()
-
     # No returned row means the mission ID did not match.
     if rows is None:
         raise HTTPException(status_code=404, detail="TERRIFYING: No users have been found.",)
+
+    # Release the database resources after fetching the data.
+    cur.close()
+    conn.close()
 
     # Pair column names with values to create one dictionary per row.
     bare_dictionary = [dict(zip(columns, row)) for row in rows]

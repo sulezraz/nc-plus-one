@@ -1,0 +1,13 @@
+[pytest]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+strict = true             # Enable pytest's additional strict checks
+
+addopts = [               # addopts saves options you would otherwise type every time
+    "-vv",                # Detailed test results and assertion comparisons
+    "--tb=long",          # Detailed error tracebacks
+    "--showlocals",       # Show local variable values in tracebacks
+    "-rA",                # Summarise all test outcomes, including passes
+    "--capture=tee-sys",  # Show Python print() output live and capture it
+]

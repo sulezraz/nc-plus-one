@@ -1,7 +1,6 @@
 import json
 from pathlib import Path
 
-
 # Locate the data folder beside this module.
 DATA_DIR = Path(__file__).resolve().parent / "data"
 

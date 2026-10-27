@@ -1,4 +1,21 @@
-# QUICK RESET
+# Quick reset and start
+1. **Reset and seed the tables:**
+2. **After the reset succeeds, start the server:**
+3. **Open the interactive API documentation:**
+
+Press **Ctrl+C** to stop the server.
+
+From the project root, with your virtual environment activated:
+Run:
+   ```bash
+   python -m reset_and_seed_database
+   python -m uvicorn main:app --reload
+   ```
+
+Press Ctrl + Shift + T to open New Terminal and then run
+   ```bash
+   explorer.exe "http://127.0.0.1:8000/docs"
+   ```
 
 
 

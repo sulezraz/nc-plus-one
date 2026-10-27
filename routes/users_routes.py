@@ -1,43 +1,54 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 
 from db.connection import get_connection
 
 users_router = APIRouter(prefix="/users")
 
 ##### GET ALL USERS #####
-# DEALS WITH USER REQUESTS
 @users_router.get("/")
 def get_all_users():
 
-    # DEALS WITH USER DATABASE QUERIES
+    # Open a database connection and create a cursor for executing SQL.
     conn = get_connection()
-    cur = conn.cursor()  # A cursor executes SQL and retrieves results.
+    cur = conn.cursor()
 
-    # Order by username
     cur.execute("""--sql
                 SELECT * FROM users
-                ORDER BY username, user_id;
+                ORDER BY username,
+                        user_id;
                 """)
 
-    # CHECK: SELECT should provide column metadata.
+    # CHECK: SELECT provides column metadata, even when no rows match.
     assert cur.description is not None
 
-    # Extract column names from the query metadata: ["id", "name", ...].
+    # Extract column names from the query metadata.
+        # ["user_id", "username", "email", "user_password", "created_at"]
     columns = [desc[0] for desc in cur.description]
-    rows = cur.fetchall()  # Retrieve all matching rows as a list of tuples.
 
-    # DEALS WITH HTTP ERROR RESPONSES
-    # No returned row means the mission ID did not match.
-    if rows is None:
-        raise HTTPException(status_code=404, detail="TERRIFYING: No users have been found.",)
+    # Retrieve all rows as a list of tuples, or [] if the table is empty.
+        # [(1, 'Alice Rahman', 'alice@example.com', 'password123', ...),
+        #  (2, 'Bob Nguyen', 'bob@example.com', 'password123', ...),
+        #  ...]
+    rows = cur.fetchall()
 
-    # DEALS WITH DATABASE CLEANUP AND RESULT CONVERSION
-    # Release the database resources after fetching the data.
+    # Empty list does not raise an error as this may be a intended behaviour
+    if not rows:
+        print("TERRIFYING: No users have been found.")
+
+    # Close the cursor, then close the database connection.
     cur.close()
     conn.close()
 
-    # Pair column names with values to create one dictionary per row.
-    bare_dictionary = [dict(zip(columns, row)) for row in rows]
+    # Pair column names with values to create a list of user dictionaries.
+        # [{'user_id': 1, 'username': 'Alice Rahman', ...},
+        #  {'user_id': 2, 'username': 'Bob Nguyen', ...},
+        #  ...]
+    users = [dict(zip(columns, row)) 
+            for row in rows]
 
-    # DEALS WITH USER RESPONSES
-    return {"users": bare_dictionary} # RETURNS: single dictionary with one key value pair
+    # Return the user dictionaries inside a response dictionary.
+        # {'users': [{'user_id': 1, 'username': 'Alice Rahman', ...},
+        #            {'user_id': 2, 'username': 'Bob Nguyen', ...},
+        #            ...]}
+    # If there are no users: {'users': []}
+    return {"users": users}

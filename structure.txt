@@ -1,0 +1,42 @@
+.
+├── .env.development
+├── .gitignore
+├── .sqlfluff
+├── .vscode
+│   ├── launch.json
+│   └── settings.json
+├── README.md
+├── db
+│   ├── connection.py
+│   ├── data
+│   │   ├── events.json
+│   │   ├── rsvps.json
+│   │   ├── users.json
+│   │   └── venues.json
+│   ├── load_json.py
+│   ├── seed
+│   │   ├── create_tables.py
+│   │   ├── drop_tables.py
+│   │   └── seed_tables.py
+│   └── setup.sql
+├── main.py
+├── models
+│   └── pydantic_models.py
+├── nc_plus_one.egg-info
+│   ├── PKG-INFO
+│   ├── SOURCES.txt
+│   ├── dependency_links.txt
+│   └── top_level.txt
+├── pyproject.toml
+├── pytest.toml
+├── requests.http
+├── requirements.txt
+├── reset_and_seed_database.py
+├── routes
+│   └── users_routes.py
+├── structure.txt
+└── tests
+    ├── test_api.py
+    └── test_app.py
+
+9 directories, 31 files

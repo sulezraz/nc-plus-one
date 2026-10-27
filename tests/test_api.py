@@ -2,8 +2,8 @@ import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
 
-from api import app
-from main import seed
+from main import app
+from reset_and_seed_database import seed
 
 
 @pytest.fixture(autouse=True)

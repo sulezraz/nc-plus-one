@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from main import seed
+from reset_and_seed_database import seed
 
 os.environ["ENV"] = "test"
 

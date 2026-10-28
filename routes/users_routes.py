@@ -10,7 +10,8 @@ users_router = APIRouter(prefix="/users")
 
 # -- GET -- # 
 
-# - Return a list of users - #
+# -- Return a list of users
+#       Order by username ASC -- #
 @users_router.get("/")
 def get_all_users():
     conn = get_connection()
@@ -37,7 +38,7 @@ def get_all_users():
     return {"users": users}
 
 
-# - Returns a single user by ID - #
+# -- Returns a single user by ID -- #
 @users_router.get("/{user_id}")
 def get_users_member(user_id: int):
     conn = get_connection()
@@ -66,6 +67,3 @@ def get_users_member(user_id: int):
     return {"user": user}
 
 
-# TODO: Create a user (POST).
-# TODO: Change a user's password (PATCH).
-# TODO: Delete a user (DELETE).

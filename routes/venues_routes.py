@@ -10,7 +10,8 @@ venues_router = APIRouter(prefix="/venues")
 
 # -- GET -- # 
 
-# - Return a list of venues - #
+# -- Return a list of venues
+#       Order by venue id ASC -- #
 @venues_router.get("/")
 def get_all_venues():
     conn = get_connection()
@@ -36,8 +37,13 @@ def get_all_venues():
     venues = [dict(zip(columns, row)) for row in rows]
     return {"venues": venues}
 
+# TODO: **FILTER: Return venues under/over a certain capacity**. 
+# Filter by: `min_capacity`, `max_capacity`; either may be omitted. 
+# Boundaries are inclusive, and minimum must not exceed maximum. 
+# Venues with null capacity do not match capacity filters.
 
-# - Returns a single venue by ID - #
+
+# -- Returns a single venue by ID -- #
 @venues_router.get("/{venue_id}")
 def get_venues_member(venue_id: int): # TODO: -> int 
     conn = get_connection()
@@ -46,7 +52,7 @@ def get_venues_member(venue_id: int): # TODO: -> int
     query = """--sql
         SELECT *
         FROM venues
-        WHERE venue_id = %s;
+        WHERE venue_id = %s;  -- Keep only rows where venue_id = the supplied parameter value.
     """
 
     # Pass values separately so the driver handles SQL parameters safely.
@@ -65,7 +71,3 @@ def get_venues_member(venue_id: int): # TODO: -> int
     venue = dict(zip(columns, row))
     return {"venue": venue}
 
-
-# TODO: Create a venue (POST).
-# TODO: Change a venue's password (PATCH).
-# TODO: Delete a venue (DELETE).

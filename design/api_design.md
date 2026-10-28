@@ -2,6 +2,7 @@
 
 This document describes the intended API behaviour; it does not implement the routes.
 
+
 ## USERS
 
 ### GET
@@ -13,7 +14,7 @@ This document describes the intended API behaviour; it does not implement the ro
 | GET | /users | Return all users | - | 200 OK | - |
 
 TODO check:  If no users exist, return `200 OK` with `{"users": []}`.
-TODO add: Sort by: `username`, `created_at`. Default: `username`, ascending.
+Sort by: `username`, `created_at`. Default: `username`, ascending.
 
 **Return a single user by ID**
 
@@ -31,7 +32,7 @@ TODO add: add proper implementation of errors found in metrotram booking api
 | :----: | :-----------: | :-------------------: | :------------------------------------------------------------------------- | :----------: | :-------------------------------: |
 | POST | /users | Creates a new user | `username` (str), <br>`email` (str), <br>`password` (str) | 201 Created | 409 Conflict, 422 Unprocessable Entity |
 
-An existing email Return `409 Conflict`. Store a password hash in `user_password`; never return the password or its hash. [] TODO EXTRA
+An existing email Return `409 Conflict`. Store a password hash in `user_password`; never return the password or its hash.
 
 
 ### PATCH
@@ -50,6 +51,7 @@ An existing email Return `409 Conflict`. Store a password hash in `user_password
 | Method |      Path      |   Description    | Request Body | Success Code |                   Error Codes                    |
 | :----: | :------------: | :--------------: | :----------: | :----------: | :----------------------------------------------: |
 | DELETE | /users/{id} | Delete a user | - | 200 OK | 404 Not Found, 409 Conflict, 422 Unprocessable Entity |
+
 
 
 ---
@@ -81,6 +83,7 @@ Filter by: `min_capacity`, `max_capacity`; either may be omitted. Boundaries are
 
 Sort by: `name`, `capacity`. Default: `name`, ascending.
 
+
 ### POST
 
 **Creates a new venue**
@@ -88,6 +91,7 @@ Sort by: `name`, `capacity`. Default: `name`, ascending.
 | Method |     Path      |      Description      | Request Body                                                               | Success Code |            Error Codes            |
 | :----: | :-----------: | :-------------------: | :------------------------------------------------------------------------- | :----------: | :-------------------------------: |
 | POST | /venues | Creates a new venue | `name` (str), <br>`address` (str, optional), <br>`capacity` (int, optional) | 201 Created | 422 Unprocessable Entity |
+
 
 ### PATCH
 
@@ -97,6 +101,7 @@ Sort by: `name`, `capacity`. Default: `name`, ascending.
 | :----: | :------------: | :-------------------: | :-------------: | :----------: | :----------------------------------------------: |
 | PATCH | /venues/{id} | Update supplied venue fields | Any of: `name` (str), `address` (str), `capacity` (int) | 200 OK | 400 Bad Request, 404 Not Found, 422 Unprocessable Entity |
 
+
 ### DELETE
 
 **Delete a venue**
@@ -105,7 +110,10 @@ Sort by: `name`, `capacity`. Default: `name`, ascending.
 | :----: | :------------: | :--------------: | :----------: | :----------: | :----------------------------------------------: |
 | DELETE | /venues/{id} | Delete a venue | - | 200 OK | 404 Not Found, 409 Conflict, 422 Unprocessable Entity |
 
+
+
 ---
+
 
 ## Events
 
@@ -132,8 +140,8 @@ Sort by: `name`, `capacity`. Default: `name`, ascending.
 Requires a join or equivalent query between `events` and `rsvps`. Return each matching event once.
 
 Filter by: `attendee_id`, `organiser_id`, `venue_id`.
-
 Sort by: `starts_at`, `ends_at`, `organiser_id`, `venue_id`. Default: `starts_at`, ascending.
+
 
 ### POST
 
@@ -145,6 +153,7 @@ Sort by: `starts_at`, `ends_at`, `organiser_id`, `venue_id`. Default: `starts_at
 
 Both datetimes are required and must include a timezone, e.g. `"2026-11-15T18:30:00+00:00"`. The end must be after the start; otherwise return `400 Bad Request`. Non-null organiser and venue IDs must reference existing records.
 
+
 ### PATCH
 
 **Change an event's details**
@@ -152,6 +161,7 @@ Both datetimes are required and must include a timezone, e.g. `"2026-11-15T18:30
 | Method |      Path      |      Description      |  Request Body   | Success Code |                   Error Codes                    |
 | :----: | :------------: | :-------------------: | :-------------: | :----------: | :----------------------------------------------: |
 | PATCH | /events/{id} | Update supplied event fields | Any of: `title`, `description`, `starts_at`, `ends_at`, `organiser_id`, `venue_id` (same types as POST) | 200 OK | 400 Bad Request, 404 Not Found, 422 Unprocessable Entity |
+
 
 ### DELETE
 
@@ -161,7 +171,9 @@ Both datetimes are required and must include a timezone, e.g. `"2026-11-15T18:30
 | :----: | :------------: | :--------------: | :----------: | :----------: | :----------------------------------------------: |
 | DELETE | /events/{id} | Delete an event | - | 200 OK | 404 Not Found, 409 Conflict, 422 Unprocessable Entity |
 
+
 ---
+
 
 ## Event registrations (RSVPs)
 
@@ -186,8 +198,8 @@ Both datetimes are required and must include a timezone, e.g. `"2026-11-15T18:30
 | GET | /rsvps?attendee_id=3 | Return event registrations filtered by attendee ID | - | 200 OK | 422 Unprocessable Entity |
 
 Filter by: `attendee_id`, `event_id`.
-
 Sort by: `attendee_id`, `event_id`, `created_at`. Default: `created_at`, ascending.
+
 
 ### POST
 
@@ -199,9 +211,11 @@ Sort by: `attendee_id`, `event_id`, `created_at`. Default: `created_at`, ascendi
 
 Both IDs are required and must exist. Registering the same attendee/event pair twice Return `409 Conflict`.
 
+
 ### PATCH
 
-Not needed with the current registration fields. To register for another event, cancel the existing registration and create a new one.
+Not needed with the current registration fields. Each RSVP is unique to user. To register for another event, cancel the existing registration and create a new one.
+
 
 ### DELETE
 
@@ -211,7 +225,11 @@ Not needed with the current registration fields. To register for another event, 
 | :----: | :------------: | :--------------: | :----------: | :----------: | :----------------------------------------------: |
 | DELETE | /rsvps/{id} | Cancel an event registration | - | 200 OK | 404 Not Found, 422 Unprocessable Entity |
 
+
+
 ---
+
+
 
 ## RESPONSE BODY
 
@@ -231,12 +249,11 @@ Not needed with the current registration fields. To register for another event, 
 | Events | `{"events": [...]}` | `{"event": {...}}` |
 | Registrations | `{"rsvps": [...]}` | `{"rsvp": {...}}` |
 
-POST and PATCH return the created or updated record in its single-record wrapper. Records include their generated IDs and public fields; passwords and hashes are excluded. Examples below abbreviate the returned fields.
+POST and PATCH return the created or updated record in its single-record wrapper. Records include their generated IDs and public fields; passwords and hashes should be excluded. Examples below abbreviate the returned fields.
 
 For example:
 
 **GET — return existing data**
-
 ```json
 {
   "user": {
@@ -247,7 +264,6 @@ For example:
 ```
 
 **POST — return the newly created record**
-
 ```json
 {
   "user": {
@@ -258,7 +274,6 @@ For example:
 ```
 
 **PATCH — return the record after updating it**
-
 ```json
 {
   "user": {
@@ -269,7 +284,6 @@ For example:
 ```
 
 **DELETE — return a confirmation with `200`:**
-
 ```json
 {
   "message": "User deleted"
@@ -280,10 +294,15 @@ For example:
 
 ## SHARED RULES
 
-- **Empty lists:** all collection GETs, including filters with no matches, return `200 OK` and an empty list. A nonexistent positive filter ID also produces no matches. Use `404` for missing single records or missing related records during POST/PATCH.
-- **Validation:** IDs must be positive integers; required text must not be blank. Check email format, database string-length limits and nonnegative capacity. Invalid input types/formats return `422 Unprocessable Entity`.
-- **PATCH:** accept one or more supplied fields, leaving omitted fields unchanged. Optional `address`, `capacity`, `description`, `organiser_id` and `venue_id` fields may be null; required fields may not. An empty update Return `400`; unknown/read-only fields return `422`. Validate the resulting start/end pair even if only one datetime changes.
-- **Generated fields:** IDs and `created_at` are server-controlled and are not accepted in POST/PATCH bodies. Optional POST fields default to null.
+- TODO/TDD - **Empty lists:** all collection GETs, including filters with no matches, return `200 OK` and an empty list. 
+  - Use `404` for missing single records or missing related records during POST/PATCH.
+- **Validation:** IDs must be positive integers; required text must not be blank. 
+  - Check email format, database string-length limits and nonnegative capacity. 
+  - Invalid input types/formats return `422 Unprocessable Entity`.
+- **PATCH:** accept one or more supplied fields, leaving omitted fields unchanged. 
+   - An empty update Return `400`; unknown/read-only fields return `422`. Validate the resulting start/end pair even if only one datetime changes.
+- **Generated fields:** IDs and `created_at` are server-controlled and are not accepted in POST/PATCH bodies. 
+  - Optional POST fields can be omitted when defined with a default, such as `address: str | None = None`, which defaults to `null`. Without `= None`, the field is required and omitting it causes a **422 validation error**. At database level, omitting a nullable column from an `INSERT` stores `NULL` if no explicit default exists.
 - **Filters and sorting:** combine filters using AND. Use `sort_by` and `order=asc` or `order=desc`; default to ascending and break ties using the resource's primary key. Allow only supported sorting fields/directions. Filtered rows above describe the same GET collection route, not separate FastAPI route paths.
 - **Deletion:** return `409 Conflict` while users, venues or events still have dependent records. Remove or reassign dependencies first. Deleting a registration keeps the user and event.
 - **Authentication:** planned, so blanket `401` entries have been removed. Once implemented, use `401` for missing/invalid authentication and `403` for insufficient permission. IDs alone do not prove who the caller is.
@@ -297,6 +316,7 @@ Example combination:
 Application errors use a detail message, e.g. `{"detail": "User not found"}`. FastAPI's automatic `422` validation responses use a list of error details. Endpoint tables list expected client errors, not every possible server failure.
 
 ## TODO: API Design Add-Ons
+- [ ] Make Filter/Sort APIs for users, events, venues, rsvps
 
 - [ ] Implement and test the routes, response wrappers and error codes.
 - [ ] Add combined filters and allowlisted sorting with consistent defaults.

@@ -57,7 +57,7 @@ def insert_events_table(conn):
         cursor.executemany(
             """--sql
             INSERT INTO events (
-                title,
+                event_name,
                 description,
                 starts_at,
                 ends_at,

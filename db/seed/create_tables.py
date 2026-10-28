@@ -48,7 +48,7 @@ def create_events_table(conn):
     create_events_sql = """--sql
         CREATE TABLE events (
             event_id SERIAL PRIMARY KEY,
-            title VARCHAR(255) NOT NULL,
+            event_name VARCHAR(255) NOT NULL,
             description VARCHAR(255),
             starts_at TIMESTAMPTZ NOT NULL,
             ends_at TIMESTAMPTZ NOT NULL,

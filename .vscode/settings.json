@@ -1,12 +1,21 @@
 {
     "cSpell.words": [
         "dotenv",
+        "Hackathon",
         "organiser",
         "organisers",
         "PGDATABASE",
         "pythonpath",
+        "Rasul",
+        "Rayyan",
         "regclass",
         "Rsvps",
-        "TIMESTAMPTZ"
-    ]
+        "Suleyman",
+        "TIMESTAMPTZ",
+        "Yusuf"
+    ],
+    "editor.tokenColorCustomizations": {
+        "comments": "",
+        "textMateRules": []
+    }
 }

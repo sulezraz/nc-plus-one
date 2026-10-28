@@ -1,12 +1,17 @@
 [
   {
-    "name": "Alice Rahman",
-    "email": "alice@example.com",
-    "password": "password123"
+    "name": "Rayyan Rasul",
+    "email": "imaskibidirizzboy@example.com",
+    "password": "poop doctor"
   },
   {
-    "name": "Bob Nguyen",
-    "email": "bob@example.com",
+    "name": "Yusuf Rasul",
+    "email": "yusufrasulskabidi@example.com",
+    "password": "jigglingbellieseveryday"
+  },
+  {
+    "name": "Suleyman Rasul",
+    "email": "chacna@example.com",
     "password": "password123"
   },
   {
@@ -15,13 +20,13 @@
     "password": "password123"
   },
   {
-    "name": "David Okafor",
-    "email": "david@example.com",
+    "name": "Frank James",
+    "email": "frank_J@example.com",
     "password": "password123"
   },
   {
-    "name": "Eve Martinez",
-    "email": "eve@example.com",
+    "name": "David Okafor",
+    "email": "david@example.com",
     "password": "password123"
   },
   {

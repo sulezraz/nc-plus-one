@@ -5,20 +5,21 @@
 ├── .vscode
 │   ├── launch.json
 │   └── settings.json
+├── NOTES.md
 ├── README.md
 ├── db
 │   ├── connection.py
+│   ├── create_database.sql
 │   ├── data
 │   │   ├── events.json
 │   │   ├── rsvps.json
 │   │   ├── users.json
 │   │   └── venues.json
 │   ├── load_json.py
-│   ├── seed
-│   │   ├── create_tables.py
-│   │   ├── drop_tables.py
-│   │   └── seed_tables.py
-│   └── setup.sql
+│   └── seed
+│       ├── create_tables.py
+│       ├── drop_tables.py
+│       └── seed_tables.py
 ├── main.py
 ├── models
 │   └── pydantic_models.py
@@ -39,4 +40,4 @@
     ├── test_api.py
     └── test_app.py
 
-9 directories, 31 files
+9 directories, 32 files

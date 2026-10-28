@@ -63,3 +63,14 @@ Open:
 
 Press **Ctrl+C** in the terminal to stop the server.
 Starting the server does not reset or seed the database unless your application explicitly calls that code.
+
+
+---
+
+
+## Other Notes
+
+### Print out project folder/file tree
+```bash
+   tree -a -I '.venv|.git|__pycache__' > structure.txt
+```

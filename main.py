@@ -7,9 +7,11 @@
 from fastapi import FastAPI
 
 from routes.users_routes import users_router
+from routes.venues_routes import venues_router
 
 # Create the application.
 app = FastAPI()
 
 # Register the users endpoints with the application.
 app.include_router(users_router)
+app.include_router(venues_router)

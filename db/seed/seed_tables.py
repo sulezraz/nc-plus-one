@@ -35,7 +35,7 @@ def insert_venues_table(conn):
         cursor.executemany(
             """--sql
             INSERT INTO venues (
-                name,
+                venue_name,
                 address,
                 capacity)
             VALUES (%s, %s, %s);

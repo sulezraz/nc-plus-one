@@ -293,22 +293,21 @@ For example:
 **You decide and implement the response structure.** The HTTP method does not automatically determine which data your endpoint Return.
 
 ## SHARED RULES
-
-- TODO/TDD - **Empty lists:** all collection GETs, including filters with no matches, return `200 OK` and an empty list. 
+- TODO/TDD - **Empty lists:** all collection GETs, including filters with no matches, return `200 OK` and an empty list.
   - Use `404` for missing single records or missing related records during POST/PATCH.
-- **Validation:** IDs must be positive integers; required text must not be blank. 
-  - Check email format, database string-length limits and nonnegative capacity. 
+- **Validation:** IDs must be positive integers; required text must not be blank.
+  - Check email format, database string-length limits and nonnegative capacity.
   - Invalid input types/formats return `422 Unprocessable Entity`.
-- **PATCH:** accept one or more supplied fields, leaving omitted fields unchanged. 
+- **PATCH:** accept one or more supplied fields, leaving omitted fields unchanged.
    - An empty update Return `400`; unknown/read-only fields return `422`. Validate the resulting start/end pair even if only one datetime changes.
-- **Generated fields:** IDs and `created_at` are server-controlled and are not accepted in POST/PATCH bodies. 
-  - Optional POST fields can be omitted when defined with a default, such as `address: str | None = None`, which defaults to `null`. Without `= None`, the field is required and omitting it causes a **422 validation error**. At database level, omitting a nullable column from an `INSERT` stores `NULL` if no explicit default exists.
-- **Filters and sorting:** combine filters using AND. Use `sort_by` and `order=asc` or `order=desc`; default to ascending and break ties using the resource's primary key. Allow only supported sorting fields/directions. Filtered rows above describe the same GET collection route, not separate FastAPI route paths.
+- **Generated fields:** IDs and `created_at` are server-controlled and are not accepted in POST/PATCH bodies.
+  - Optional POST fields default to null when configured with = None in the API model, or when omitted from an INSERT into a nullable database column with no explicit default.
+- **Filters and sorting:** combine filters using AND. Use `sort_by` and `order=asc` or `order=desc`; default to ascending and break ties using the resource's primary key. 
+  - Accept only approved `sort_by` fields and `asc`/`desc` order values. The filtered examples above all use the same GET route with different query parameters; they do not require separate FastAPI routes.
 - **Deletion:** return `409 Conflict` while users, venues or events still have dependent records. Remove or reassign dependencies first. Deleting a registration keeps the user and event.
 - **Authentication:** planned, so blanket `401` entries have been removed. Once implemented, use `401` for missing/invalid authentication and `403` for insufficient permission. IDs alone do not prove who the caller is.
 
 Example combination:
-
 ```text
 /events?attendee_id=3&sort_by=starts_at&order=asc
 ```
@@ -326,12 +325,13 @@ Application errors use a detail message, e.g. `{"detail": "User not found"}`. Fa
 - [ ] Test empty lists, missing records, invalid input, duplicates and relationship conflicts.
 
 
-### Notes
+## Notes
+
+### Query parameters and SQL
 - **URL parameters do not change SQL automatically.** Adding `sort_by` or `order` to a link only supplies values to the API.
-- **The backend must read, validate and apply them.** FastAPI can read declared query parameters, but your database code must choose the corresponding `ORDER BY`.
+- **The backend must read, validate and apply them.** FastAPI reads declared query parameters, but your database code must choose the corresponding `ORDER BY`.
 - **Fixed SQL stays fixed.** `ORDER BY username, user_id` continues sorting by username unless your code uses the supplied sorting choice.
-- **Define the supported choices in the API.** For example, users support `username` and `created_at`; events support `starts_at`. Only allow approved fields and `asc`/`desc` directions.
-- **One collection route can support multiple combinations.** You do not need a separate route for every filter or sort. Use `?` for the first query parameter and `&` for additional ones.
+- **Define the supported choices.** For example, users support `username` and `created_at`; events support `starts_at`. Only allow approved fields and `asc`/`desc` directions.
 
 Example request:
 ```text
@@ -344,3 +344,36 @@ ORDER BY created_at DESC, user_id ASC;
 ```
 
 The user ID breaks ties when creation timestamps match.
+
+### Combining filters and sorting
+One collection route can support multiple filters and sorting choices. You do not need a separate route for every combination.
+
+Use `?` for the first query parameter and `&` for additional ones:
+```text
+/events?venue_id=2&sort_by=starts_at&order=asc
+```
+
+This requests events at venue 2, sorted by start time from earliest to latest.
+
+### Required fields, nulls and defaults
+
+In a Pydantic request model:
+Allows a string or `None` (`null` in JSON), but the field is **required**.
+```python
+address: str | None
+```
+
+Allows the same values, but supplies a default so the field **can be omitted**.
+```python
+address: str | None = None
+```
+
+
+| Request body | Without `= None` | With `= None` |
+|---|---|---|
+| `{"address": "123 High Street"}` | Accepted | Accepted |
+| `{"address": null}` | Accepted | Accepted |
+| `{}` | 422: field missing | Accepted; defaults to `None` |
+
+At database level, omitting a column from an `INSERT` uses its declared default. If no default exists, PostgreSQL uses `NULL`; a `NOT NULL` constraint would reject it.
+

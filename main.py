@@ -5,9 +5,9 @@
 # python -m uvicorn main:app --reload
 
 from fastapi import FastAPI
-from routes.rsvps_routes import rsvps_router
 
 from routes.events_routes import events_router
+from routes.rsvps_routes import rsvps_router
 from routes.users_routes import users_router
 from routes.venues_routes import venues_router
 

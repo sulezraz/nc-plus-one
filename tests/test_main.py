@@ -1,6 +1,7 @@
 import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
+from rich.pretty import pprint
 
 from main import app
 from reset_and_seed_database import seed
@@ -18,19 +19,20 @@ def client():
     return TestClient(app)
 
 
-def test_get_users_responds_with200(client):
+def test_GET_users_responds_with_status_200(client):
     # Send GET /users and check for a successful response.
-    response = client.get("/users")
-    assert response.status_code == status.HTTP_200_OK
+    users = client.get("/users")
 
+    assert users.status_code == status.HTTP_200_OK
+    assert users.headers["content-type"] == "application/json"
 
-def test_get_users_responds_with_list_on_key_of_users(client):
+def test_GET_users_responds_with_list_on_key_of_users(client):
     # Parse the response body and extract the value under "users".
     users = client.get("/users").json()["users"]
-
-    # Check that the value is a list, including when it is empty.
+    
+    assert list(users[0].keys()) == ['user_id', 'username', 'email', 'user_password', 'created_at']
     assert isinstance(users, list)
-    assert len(users) > 0
+    assert isinstance(users[0], dict)
     
     
     

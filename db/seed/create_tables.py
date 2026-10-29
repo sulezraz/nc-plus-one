@@ -1,8 +1,9 @@
 # db/seed/create_tables.py
 # Creates the users, venues, events and rsvps tables with their columns, constraints and default values.
+import psycopg
 
 
-def create_users_table(conn):
+def create_users_table(conn: psycopg.Connection) -> None:
     # Define the user columns, constraints and generated defaults.
     create_users_sql = """--sql
         CREATE TABLE users (
@@ -23,7 +24,7 @@ def create_users_table(conn):
     print("CREATE TABLE users.")
 
 
-def create_venues_table(conn):
+def create_venues_table(conn: psycopg.Connection) -> None:
     # Define the venue columns; address and capacity may be NULL.
     create_venues_sql = """--sql
         CREATE TABLE venues (
@@ -43,7 +44,7 @@ def create_venues_table(conn):
     print("CREATE TABLE venues.")
 
 
-def create_events_table(conn):
+def create_events_table(conn: psycopg.Connection) -> None:
     # Define events with foreign keys to users and venues.
     create_events_sql = """--sql
         CREATE TABLE events (
@@ -67,7 +68,7 @@ def create_events_table(conn):
     print("CREATE TABLE events.")
 
 
-def create_rsvps_table(conn):
+def create_rsvps_table(conn: psycopg.Connection) -> None:
     # Define RSVPs with foreign keys to users and events.
     create_rsvps_sql = """--sql
         CREATE TABLE rsvps (

@@ -13,7 +13,7 @@ rsvps_router = APIRouter(prefix="/rsvps")
 # -- Return a list of event registrations
 #       Order by created_at ASC -- #
 @rsvps_router.get("/")
-def get_all_rsvps():
+def get_all_rsvps() -> dict[str, list[dict]]:
     conn = get_connection()
     cur = conn.cursor()
 
@@ -40,7 +40,7 @@ def get_all_rsvps():
 
 # -- Returns a single rsvp by ID -- #
 @rsvps_router.get("/{rsvp_id}")
-def get_rsvps_member(rsvp_id: int):
+def get_rsvps(rsvp_id: int) -> dict[str, dict]:
     conn = get_connection()
     cur = conn.cursor()
 
@@ -67,3 +67,14 @@ def get_rsvps_member(rsvp_id: int):
     return {"rsvp": rsvp}
 
 
+
+
+
+# # -- MANUAL RESPONSE INSPECTION -- #
+# if __name__ == "__main__":
+#     pprint("ALL RSVPs:")
+#     pprint(get_all_rsvps())
+#     print()
+
+#     pprint("SINGLE RSVP:")
+#     pprint(get_rsvp(1))  # Use a rsvp ID that exists.

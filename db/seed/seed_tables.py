@@ -1,10 +1,12 @@
 # db/seed/seed_tables.py
 # Inserts JSON seed data into the users, venues, events and rsvps tables.
 
+import psycopg
+
 from db.load_json import convert_tuple, load_json
 
 
-def insert_users_table(conn):
+def insert_users_table(conn: psycopg.Connection) -> None:
     # Load users.json and convert each record into a tuple.
     users = convert_tuple(load_json("users.json"))
 
@@ -26,7 +28,7 @@ def insert_users_table(conn):
     print("INSERT INTO users committed.")
 
 
-def insert_venues_table(conn):
+def insert_venues_table(conn: psycopg.Connection) -> None:
     # Load venues.json and convert each record into a tuple.
     venues = convert_tuple(load_json("venues.json"))
 
@@ -48,7 +50,7 @@ def insert_venues_table(conn):
     print("INSERT INTO venues committed.")
 
 
-def insert_events_table(conn):
+def insert_events_table(conn: psycopg.Connection) -> None:
     # Load events.json and convert each record into a tuple.
     events = convert_tuple(load_json("events.json"))
 
@@ -74,7 +76,7 @@ def insert_events_table(conn):
     print("INSERT INTO events committed.")
 
 
-def insert_rsvps_table(conn):
+def insert_rsvps_table(conn: psycopg.Connection) -> None:
     # Load rsvps.json and convert each record into a tuple.
     rsvps = convert_tuple(load_json("rsvps.json"))
 

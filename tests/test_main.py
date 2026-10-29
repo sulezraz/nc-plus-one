@@ -6,23 +6,24 @@ from rich.pretty import pprint
 from main import app
 from reset_and_seed_database import seed
 
+# TODO: introduce type validation
 
 @pytest.fixture(autouse=True)
-def seed_test_db():
+def seed_test_db() -> None:
     # Reset and seed the configured database before each test in this file.
     seed()
 
 
 @pytest.fixture()
-def client():
+def client() -> TestClient:
     # Create a fresh test client for each test that requests it.
     return TestClient(app)
 
 
-def test_GET_users_responds_with_status_200(client):
+def test_GET_users_responds_with_status_200(client: TestClient) -> None:
     # Send GET /users and check for a successful response.
     users = client.get("/users")
-
+    pprint(users.json())
     assert users.status_code == status.HTTP_200_OK
     assert users.headers["content-type"] == "application/json"
 

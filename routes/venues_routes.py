@@ -2,18 +2,20 @@
 # Defines venues endpoints, such as GET /venues/, and the functions that handle their requests.
 
 from fastapi import APIRouter, HTTPException
+from rich.pretty import pprint
 
 from db.connection import get_connection
 
 venues_router = APIRouter(prefix="/venues")
 
-
+#-----------#
 # -- GET -- # 
+#-----------#
 
 # -- Return a list of venues
 #       Order by venue id ASC -- #
 @venues_router.get("/")
-def get_all_venues():
+def get_all_venues() -> dict[str, list[dict]]:
     conn = get_connection()
     cur = conn.cursor()
 
@@ -33,9 +35,10 @@ def get_all_venues():
     if not rows:
         print("TERRIFYING: No venues have been found.")
 
-    # Map database columns to row values.
     venues = [dict(zip(columns, row)) for row in rows]
     return {"venues": venues}
+
+
 
 # TODO: **FILTER: Return venues under/over a certain capacity**. 
 # Filter by: `min_capacity`, `max_capacity`; either may be omitted. 
@@ -45,10 +48,10 @@ def get_all_venues():
 
 # -- Returns a single venue by ID -- #
 @venues_router.get("/{venue_id}")
-def get_venues_member(venue_id: int): # TODO: -> int 
+def get_venue(venue_id: int) -> dict[str, dict]:
     conn = get_connection()
     cur = conn.cursor()
-
+    
     query = """--sql
         SELECT *
         FROM venues
@@ -57,11 +60,11 @@ def get_venues_member(venue_id: int): # TODO: -> int
 
     # Pass values separately so the driver handles SQL parameters safely.
     cur.execute(query, (venue_id,))
-
+    
     assert cur.description is not None
     columns = [desc[0] for desc in cur.description]
     row = cur.fetchone()
-
+    
     cur.close()
     conn.close()
 
@@ -71,3 +74,17 @@ def get_venues_member(venue_id: int): # TODO: -> int
     venue = dict(zip(columns, row))
     return {"venue": venue}
 
+
+
+
+
+
+
+# # -- MANUAL RESPONSE INSPECTION -- #
+# if __name__ == "__main__":
+#     pprint("ALL VENUES:")
+#     pprint(get_all_venues())
+#     print()
+
+#     pprint("SINGLE VENUE:")
+#     pprint(get_venue(1))  # Use a venue ID that exists.

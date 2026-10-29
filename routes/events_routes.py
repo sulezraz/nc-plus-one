@@ -2,18 +2,20 @@
 # Defines events endpoints, such as GET /events/, and the functions that handle their requests.
 
 from fastapi import APIRouter, HTTPException
+from rich.pretty import pprint
 
 from db.connection import get_connection
 
 events_router = APIRouter(prefix="/events")
 
-
+#-----------#
 # -- GET -- # 
+#-----------#
 
 # -- Return a list of events
 #       Order by event_name ASC -- #
 @events_router.get("/")
-def get_all_events():
+def get_all_events() -> dict[str, list[dict]]:
     conn = get_connection()
     cur = conn.cursor()
 
@@ -40,7 +42,7 @@ def get_all_events():
 
 # -- Returns a single event by ID -- #
 @events_router.get("/{event_id}")
-def get_events_member(event_id: int):
+def get_event(event_id: int) -> dict[str, dict]:
     conn = get_connection()
     cur = conn.cursor()
 
@@ -67,3 +69,14 @@ def get_events_member(event_id: int):
     return {"event": event}
 
 
+
+
+
+# # -- MANUAL RESPONSE INSPECTION -- #
+# if __name__ == "__main__":
+#     pprint("ALL EVENTS:")
+#     pprint(get_all_events())
+#     print()
+
+#     pprint("SINGLE EVENT:")
+#     pprint(get_event(1))  # Use a event ID that exists.

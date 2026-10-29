@@ -2,18 +2,21 @@
 # Defines users endpoints, such as GET /users/, and the functions that handle their requests.
 
 from fastapi import APIRouter, HTTPException
+from rich.pretty import pprint
 
 from db.connection import get_connection
 
 users_router = APIRouter(prefix="/users")
 
 
+#-----------#
 # -- GET -- # 
+#-----------#
 
 # -- Return a list of users
 #       Order by username ASC -- #
 @users_router.get("/")
-def get_all_users():
+def get_all_users() -> dict[str, list[dict]]:
     conn = get_connection()
     cur = conn.cursor()
 
@@ -40,7 +43,7 @@ def get_all_users():
 
 # -- Returns a single user by ID -- #
 @users_router.get("/{user_id}")
-def get_users_member(user_id: int):
+def get_user(user_id: int) -> dict[str, dict[str, int]]:
     conn = get_connection()
     cur = conn.cursor()
 
@@ -67,3 +70,13 @@ def get_users_member(user_id: int):
     return {"user": user}
 
 
+
+
+# -- MANUAL RESPONSE INSPECTION -- #
+if __name__ == "__main__":
+    pprint("ALL USERS:")
+    pprint(get_all_users())
+    print()
+
+    pprint("SINGLE USER:")
+    pprint(get_user(1))  # Use a user ID that exists.

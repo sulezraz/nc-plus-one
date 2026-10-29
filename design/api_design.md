@@ -325,6 +325,7 @@ Application errors use a detail message, e.g. `{"detail": "User not found"}`. Fa
 - [ ] Test empty lists, missing records, invalid input, duplicates and relationship conflicts.
 
 
+
 ## Notes
 
 ### Query parameters and SQL
@@ -346,6 +347,7 @@ ORDER BY created_at DESC, user_id ASC;
 The user ID breaks ties when creation timestamps match.
 
 ### Combining filters and sorting
+
 One collection route can support multiple filters and sorting choices. You do not need a separate route for every combination.
 
 Use `?` for the first query parameter and `&` for additional ones:
@@ -357,17 +359,15 @@ This requests events at venue 2, sorted by start time from earliest to latest.
 
 ### Required fields, nulls and defaults
 
-In a Pydantic request model:
-Allows a string or `None` (`null` in JSON), but the field is **required**.
+In a Pydantic request model, this allows a string or `None` (`null` in JSON), but the field is **required**:
 ```python
 address: str | None
 ```
 
-Allows the same values, but supplies a default so the field **can be omitted**.
+This allows the same values, but supplies a default so the field **can be omitted**:
 ```python
 address: str | None = None
 ```
-
 
 | Request body | Without `= None` | With `= None` |
 |---|---|---|
@@ -377,3 +377,139 @@ address: str | None = None
 
 At database level, omitting a column from an `INSERT` uses its declared default. If no default exists, PostgreSQL uses `NULL`; a `NOT NULL` constraint would reject it.
 
+### Request validation and 422 errors
+
+FastAPI matches the request to a route, then validates the input using the declared Pydantic model **before running the route handler**.
+```python
+class RsvpCreate(BaseModel):
+    attendee_id: int
+    event_id: int
+```
+
+For this request:
+```json
+{
+  "attendee_id": 1,
+  "event_id": "string"
+}
+```
+
+FastAPI automatically returns **422** with validation details:
+```json
+{
+  "detail": [
+    {
+      "type": "int_parsing",
+      "loc": ["body", "event_id"],
+      "msg": "Input should be a valid integer, unable to parse string as an integer",
+      "input": "string"
+    }
+  ]
+}
+```
+- **`type`:** The kind of validation failure.
+- **`loc`:** Where the invalid value was found—in this case, `event_id` in the request body.
+- **`msg`:** An explanation of the failure.
+- **`input`:** The value that failed validation.
+
+The handler’s body does not run when request validation fails. You do not need to raise another error for missing fields or values the model rejects.
+
+### Terminal logs versus response bodies
+
+Uvicorn’s standard access log shows the request and its status:
+```text
+"POST /rsvps/ HTTP/1.1" 422 Unprocessable Content
+```
+
+The **HTTP response body** contains the detailed validation errors. View it through `curl`, your frontend, or the response section in Swagger UI at `/docs`.
+
+To format a JSON response in the terminal:
+```bash
+curl -s -X POST 'http://127.0.0.1:8000/rsvps/' \
+  -H 'Content-Type: application/json' \
+  -d '{"attendee_id": 1, "event_id": "string"}' \
+  | python -m json.tool
+```
+
+### Raising errors inside route handlers
+
+Use `HTTPException` when a request passes input validation but cannot be completed:
+```python
+from fastapi import HTTPException
+
+# After looking up the event:
+if event_row is None:
+    raise HTTPException(
+        status_code=404,
+        detail="Event not found.",
+    )
+```
+
+`raise` stops normal execution. FastAPI sends the error response to the client:
+```json
+{
+  "detail": "Event not found."
+}
+```
+
+Perform the relevant checks before inserting or committing. Ensure database resources are closed even when an exception occurs.
+
+Suggested checks for `create_rsvp()`:
+1. **404:** Does `rsvp.event_id` refer to an existing event?
+2. **404:** Does `rsvp.attendee_id` refer to an existing user?
+3. **409:** Has this attendee already RSVP’d to this event?
+4. **409:** Is the event full?
+
+These are API design choices: use them consistently. A valid integer can still reference a record that does not exist.
+
+Database constraints should also enforce rules such as foreign keys and unique attendee/event pairs. Checks alone cannot prevent simultaneous requests from creating conflicts.
+
+### Custom validation messages
+
+Default validation messages are usually enough because they identify the field and explain the failure.
+
+For custom input rules, raise `ValueError` inside a Pydantic validator:
+```python
+from pydantic import BaseModel, field_validator
+
+class RsvpCreate(BaseModel):
+    attendee_id: int
+    event_id: int
+
+    @field_validator("attendee_id")
+    @classmethod
+    def validate_attendee_id(cls, value: int) -> int:
+        if value <= 0:
+            raise ValueError("Attendee ID must be greater than 0.")
+        return value
+```
+
+FastAPI includes the message in its **422** response.
+
+For that simple rule, a built-in constraint is shorter:
+```python
+attendee_id: int = Field(gt=0)
+```
+
+To customise built-in failures such as missing fields or incorrect types, register a **`RequestValidationError` handler** on the FastAPI app. `Field(error_messages=...)` does not configure custom validation messages.
+
+See [FastAPI’s error handling documentation](https://fastapi.tiangolo.com/tutorial/handling-errors/).
+
+### Other common HTTP errors
+
+| Status | Meaning | Example |
+|---|---|---|
+| **400 Bad Request** | The request is invalid at a general level. | An unsupported combination of request options. |
+| **401 Unauthorized** | Authentication is required or credentials are invalid. | Missing or expired login token. |
+| **403 Forbidden** | The caller lacks permission. | A user tries to edit someone else’s event. |
+| **404 Not Found** | The requested resource does not exist. | No event exists with the supplied ID. |
+| **405 Method Not Allowed** | The URL does not support that HTTP method. | Sending `DELETE` to a route that only supports `GET`. |
+| **409 Conflict** | The request conflicts with the current state. | Duplicate RSVP, full event, or an email already in use. |
+| **422 Unprocessable Content** | Input fails validation. | Missing required field, invalid integer, or invalid date. |
+| **429 Too Many Requests** | The caller has exceeded a rate limit. | Too many requests within a short period. |
+| **500 Internal Server Error** | An unexpected server failure occurred. | An unhandled programming error. |
+| **503 Service Unavailable** | The service is temporarily unavailable. | A temporary outage prevents requests from being served. |
+
+FastAPI handles some errors automatically, including request validation failures and unsupported methods. Your code must implement business checks such as duplicate RSVPs and event capacity.
+
+Status meanings: [HTTP status code reference](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status).

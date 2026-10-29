@@ -59,7 +59,7 @@ def create_events_table(conn: psycopg.Connection) -> None:
         );
     """
 
-    # The referenced users and venues tables must already exist.
+    # Execute the statement and automatically close the cursor.
     with conn.cursor() as cursor:
         cursor.execute(create_events_sql)
 

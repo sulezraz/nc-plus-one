@@ -9,7 +9,7 @@ from fastapi import APIRouter, HTTPException
 from rich.pretty import pprint
 
 from db.connection import get_connection
-from models.pydantic_models import EventsCreate, EventsUpdate
+from models.pydantic_models import EventCreate, EventUpdate
 
 events_router = APIRouter(prefix="/events")
 
@@ -82,7 +82,7 @@ def get_event(event_id: int) -> dict[str, dict]:
 
 # -- Add a new event -- #
 @events_router.post("/", status_code=201) # Return HTTP 201 Created when the route completes successfully.
-def create_event(event: EventsCreate) -> dict[str, dict]:
+def create_event(event: EventCreate) -> dict[str, dict]:
     
     conn = get_connection()
     cur = conn.cursor()
@@ -121,8 +121,7 @@ def create_event(event: EventsCreate) -> dict[str, dict]:
     cur.close()   # Release the cursor
     conn.close()  # Close the connection
     
-    if row is None:
-        raise RuntimeError("Event insert did not return the expected row.")
+    assert row is not None
 
     posted_event = dict(zip(columns, row))
     return {"event": posted_event}
@@ -143,16 +142,16 @@ def create_event(event: EventsCreate) -> dict[str, dict]:
 #     pprint(get_event(1))  # Use a event ID that exists.
 
 
-# -- MANUAL RESPONSE INSPECTION -- #
-if __name__ == "__main__":
-    new_event = EventsCreate(
-        event_name="Python Workshop",
-        description="An introduction to Python.",
-        starts_at="2026-01-05T12:34:00", # type: ignore
-        ends_at="2026-02-15T10:45:00", # type: ignore
-        organiser_id=1,
-        venue_id=1,
-    )
+# # -- MANUAL RESPONSE INSPECTION -- #
+# if __name__ == "__main__":
+#     new_event = EventCreate(
+#         event_name="Python Workshop",
+#         description="An introduction to Python.",
+#         starts_at="2026-01-05T12:34:00", # type: ignore
+#         ends_at="2026-02-15T10:45:00", # type: ignore
+#         organiser_id=1,
+#         venue_id=1,
+#     )
 
-    pprint("CREATED EVENT:")
-    pprint(create_event(new_event))
+#     pprint("CREATED EVENT:")
+#     pprint(create_event(new_event))

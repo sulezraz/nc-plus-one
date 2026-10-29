@@ -5,6 +5,7 @@ from fastapi import APIRouter, HTTPException
 from rich.pretty import pprint
 
 from db.connection import get_connection
+from models.pydantic_models import VenueCreate, VenueUpdate
 
 venues_router = APIRouter(prefix="/venues")
 
@@ -74,6 +75,50 @@ def get_venue(venue_id: int) -> dict[str, dict]:
     venue = dict(zip(columns, row))
     return {"venue": venue}
 
+
+#------------#
+# -- POST -- # 
+#------------#
+
+# -- Add a new venue -- #
+@venues_router.post("/", status_code=201) # Return HTTP 201 Created when the route completes successfully.
+def create_venue(venue: VenueCreate) -> dict[str, dict]:
+    
+    conn = get_connection()
+    cur = conn.cursor()
+    
+    query = """--sql
+        INSERT INTO venues (
+            venue_name,
+            address,
+            capacity
+        )
+        VALUES (%s, %s, %s)
+        RETURNING *;
+    """
+
+    # Pass values separately so the driver handles SQL parameters safely.
+    cur.execute(
+        query,
+        (
+            venue.venue_name,
+            venue.address,
+            venue.capacity,
+        ),
+    )
+    
+    assert cur.description is not None          # CHECK: sql query must return column metadata
+    columns = [desc[0] for desc in cur.description]
+    row = cur.fetchone()
+
+    conn.commit()  # Save the transaction's changes.
+    cur.close()   # Release the cursor
+    conn.close()  # Close the connection
+    
+    assert row is not None
+    
+    posted_venue = dict(zip(columns, row))
+    return {"venue": posted_venue}
 
 
 

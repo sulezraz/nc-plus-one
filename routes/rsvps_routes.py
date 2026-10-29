@@ -4,6 +4,7 @@
 from fastapi import APIRouter, HTTPException
 
 from db.connection import get_connection
+from models.pydantic_models import RsvpCreate, RsvpUpdate
 
 rsvps_router = APIRouter(prefix="/rsvps")
 
@@ -65,6 +66,49 @@ def get_rsvps(rsvp_id: int) -> dict[str, dict]:
 
     rsvp = dict(zip(columns, row))
     return {"rsvp": rsvp}
+
+
+#------------#
+# -- POST -- # 
+#------------#
+
+# -- Add a new rsvp -- #
+@rsvps_router.post("/", status_code=201) # Return HTTP 201 Created when the route completes successfully.
+def create_rsvp(rsvp: RsvpCreate) -> dict[str, dict]:
+    
+    conn = get_connection()
+    cur = conn.cursor()
+    
+    query = """--sql
+        INSERT INTO rsvps (
+            attendee_id,
+            event_id
+        )
+        VALUES (%s, %s)
+        RETURNING *;
+    """
+
+    # Pass values separately so the driver handles SQL parameters safely.
+    cur.execute(
+        query,
+        (
+            rsvp.attendee_id,
+            rsvp.event_id,
+        ),
+    )
+    
+    assert cur.description is not None          # CHECK: sql query must return column metadata
+    columns = [desc[0] for desc in cur.description]
+    row = cur.fetchone()
+
+    conn.commit()  # Save the transaction's changes.
+    cur.close()   # Release the cursor
+    conn.close()  # Close the connection
+    
+    assert row is not None
+    
+    posted_rsvp = dict(zip(columns, row))
+    return {"rsvp": posted_rsvp}
 
 
 

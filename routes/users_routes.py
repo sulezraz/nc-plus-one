@@ -113,8 +113,7 @@ def create_user(user: UserCreate) -> dict[str, dict]:
     cur.close()   # Release the cursor
     conn.close()  # Close the connection
     
-    if row is None:
-        raise RuntimeError("User insert did not return the expected row.")
+    assert row is not None
 
     posted_user = dict(zip(columns, row))
     return {"user": posted_user}

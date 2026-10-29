@@ -18,7 +18,7 @@ def load_json(json_file: str) -> list[dict]:
     return data
 
 
-def convert_tuple(data) -> list[tuple]:
+def convert_tuple(data: list[dict]) -> list[tuple]:
     # Convert each record's values into a tuple in dictionary key order.
     # This order must match the columns listed in the INSERT statement.
     tuple_list = []

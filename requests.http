@@ -8,6 +8,19 @@ GET http://127.0.0.1:8000/users/1
 ### Get user that doesn't exist
 GET http://127.0.0.1:8000/users/99
 
+---
+
+### Update a disposable test user
+POST http://127.0.0.1:8000/users/
+Content-Type: application/json
+
+{
+    "username": "Rasudl",
+    "email": "jibbly@examples.com",
+    "user_password": "jibdblys"
+}
+
+
 ### Update a disposable test user
 PATCH http://127.0.0.1:8000/missions/3
 Content-Type: application/json

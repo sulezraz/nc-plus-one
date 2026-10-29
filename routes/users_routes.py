@@ -1,10 +1,14 @@
 # users_routes.py
 # Defines users endpoints, such as GET /users/, and the functions that handle their requests.
+import sys
+
+sys.path.insert(0,"/home/suleyman/projects/northcoders/2projects/nc-plus-one")
 
 from fastapi import APIRouter, HTTPException
 from rich.pretty import pprint
 
 from db.connection import get_connection
+from models.pydantic_models import UserCreate, UserUpdate
 
 users_router = APIRouter(prefix="/users")
 
@@ -70,13 +74,58 @@ def get_user(user_id: int) -> dict[str, dict[str, int]]:
     return {"user": user}
 
 
+#------------#
+# -- POST -- # 
+#------------#
+
+# -- Add a new user -- #
+@users_router.post("/", status_code=201) # Return HTTP 201 Created when the route completes successfully.
+def create_user(user: UserCreate) -> dict[str, dict[str, int]]:
+    
+    conn = get_connection()
+    cur = conn.cursor()
+    
+    cur.execute(
+        """--sql
+        INSERT INTO users (
+            username,
+            email,
+            user_password
+        )
+        VALUES (%s, %s, %s)
+        RETURNING*;
+        """,
+        (
+            user.username,
+            user.email,
+            user.user_password
+        ),
+    )
+    
+    assert cur.description is not None          # CHECK: sql query must return column metadata
+    columns = [desc[0] for desc in cur.description]
+    row = cur.fetchone()
+
+    conn.commit()  # Save the transaction's changes.
+    cur.close()   # Release the cursor
+    conn.close()  # Close the connection
+    
+    if row is None:
+        raise RuntimeError("User insert did not return the expected row.")
+
+    posted_user = dict(zip(columns, row))
+    return {"user": posted_user}
 
 
-# -- MANUAL RESPONSE INSPECTION -- #
-if __name__ == "__main__":
-    pprint("ALL USERS:")
-    pprint(get_all_users())
-    print()
 
-    pprint("SINGLE USER:")
-    pprint(get_user(1))  # Use a user ID that exists.
+
+
+
+# # -- MANUAL RESPONSE INSPECTION -- #
+# if __name__ == "__main__":
+#     pprint("ALL USERS:")
+#     pprint(get_all_users())
+#     print()
+
+#     pprint("SINGLE USER:")
+#     pprint(get_user(1))  # Use a user ID that exists.

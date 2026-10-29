@@ -80,25 +80,28 @@ def get_user(user_id: int) -> dict[str, dict[str, int]]:
 
 # -- Add a new user -- #
 @users_router.post("/", status_code=201) # Return HTTP 201 Created when the route completes successfully.
-def create_user(user: UserCreate) -> dict[str, dict[str, int]]:
+def create_user(user: UserCreate) -> dict[str, dict]:
     
     conn = get_connection()
     cur = conn.cursor()
     
-    cur.execute(
-        """--sql
+    query = """--sql
         INSERT INTO users (
             username,
             email,
             user_password
         )
         VALUES (%s, %s, %s)
-        RETURNING*;
-        """,
+        RETURNING *;
+    """
+
+    # Pass values separately so the driver handles SQL parameters safely.
+    cur.execute(
+        query,
         (
             user.username,
             user.email,
-            user.user_password
+            user.user_password,
         ),
     )
     

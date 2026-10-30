@@ -74,3 +74,17 @@ Starting the server does not reset or seed the database unless your application 
 ```bash
    tree -a -I '.venv|.git|__pycache__' > structure.txt
 ```
+
+
+### Example POST curl:
+```
+curl -X 'POST' \
+  'http://127.0.0.1:8000/users/' \
+  -H 'accept: */*' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "username": "Suleyman Rasul",
+    "email": "chacna@example.com",
+    "password": "user_password123"
+}' | python -m json.tool
+```

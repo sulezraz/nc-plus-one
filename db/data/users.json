@@ -1,37 +1,37 @@
 [
   {
-    "name": "Rayyan Rasul",
+    "username": "Rayyan Rasul",
     "email": "imaskibidirizzboy@example.com",
     "password": "poop doctor"
   },
   {
-    "name": "Yusuf Rasul",
+    "username": "Yusuf Rasul",
     "email": "yusufrasulskabidi@example.com",
     "password": "jigglingbellieseveryday"
   },
   {
-    "name": "Suleyman Rasul",
+    "username": "Suleyman Rasul",
     "email": "chacna@example.com",
-    "password": "password123"
+    "password": "user_password123"
   },
   {
-    "name": "Carol Singh",
+    "username": "Carol Singh",
     "email": "carol@example.com",
-    "password": "password123"
+    "password": "user_password123"
   },
   {
-    "name": "Frank James",
+    "username": "Frank James",
     "email": "frank_J@example.com",
-    "password": "password123"
+    "password": "user_password123"
   },
   {
-    "name": "David Okafor",
+    "username": "David Okafor",
     "email": "david@example.com",
-    "password": "password123"
+    "password": "user_password123"
   },
   {
-    "name": "Frank Liu",
+    "username": "Frank Liu",
     "email": "frank@example.com",
-    "password": "password123"
+    "password": "user_password123"
   }
 ]

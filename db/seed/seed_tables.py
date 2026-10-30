@@ -10,14 +10,14 @@ def insert_users_table(conn: psycopg.Connection) -> None:
     # Load users.json and convert each record into a tuple.
     users = convert_tuple(load_json("users.json"))
 
-    # Insert tuples in username, email, user_password order.
+    # Insert tuples in username, email, password order.
     with conn.cursor() as cursor:
         cursor.executemany(
             """--sql
             INSERT INTO users (
                 username,
                 email,
-                user_password)
+                password)
             VALUES (%s, %s, %s);
             """,
             users,
@@ -25,7 +25,7 @@ def insert_users_table(conn: psycopg.Connection) -> None:
 
     # Commit before reporting success; the connection remains open.
     conn.commit()
-    print("INSERT INTO users committed.")
+    # print("INSERT INTO users committed.")
 
 
 def insert_venues_table(conn: psycopg.Connection) -> None:
@@ -47,7 +47,7 @@ def insert_venues_table(conn: psycopg.Connection) -> None:
 
     # Commit before reporting success; the connection remains open.
     conn.commit()
-    print("INSERT INTO venues committed.")
+    # print("INSERT INTO venues committed.")
 
 
 def insert_events_table(conn: psycopg.Connection) -> None:
@@ -73,7 +73,7 @@ def insert_events_table(conn: psycopg.Connection) -> None:
 
     # Commit before reporting success; the connection remains open.
     conn.commit()
-    print("INSERT INTO events committed.")
+    # print("INSERT INTO events committed.")
 
 
 def insert_rsvps_table(conn: psycopg.Connection) -> None:
@@ -94,4 +94,4 @@ def insert_rsvps_table(conn: psycopg.Connection) -> None:
 
     # Commit before reporting success; the connection remains open.
     conn.commit()
-    print("INSERT INTO rsvps committed.")
+    # print("INSERT INTO rsvps committed.")

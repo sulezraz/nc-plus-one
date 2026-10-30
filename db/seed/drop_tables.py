@@ -13,7 +13,7 @@ def drop_users_table(conn: psycopg.Connection) -> None:
 
     # Commit before reporting success; the connection remains open.
     conn.commit()
-    print("DROP TABLE users.")
+    # print("DROP TABLE users.")
 
 
 def drop_venues_table(conn: psycopg.Connection) -> None:
@@ -26,7 +26,7 @@ def drop_venues_table(conn: psycopg.Connection) -> None:
 
     # Commit before reporting success; the connection remains open.
     conn.commit()
-    print("DROP TABLE venues.")
+    # print("DROP TABLE venues.")
 
 
 def drop_events_table(conn: psycopg.Connection) -> None:
@@ -39,7 +39,7 @@ def drop_events_table(conn: psycopg.Connection) -> None:
 
     # Commit before reporting success; the connection remains open.
     conn.commit()
-    print("DROP TABLE events.")
+    # print("DROP TABLE events.")
 
 
 def drop_rsvps_table(conn: psycopg.Connection) -> None:
@@ -52,4 +52,4 @@ def drop_rsvps_table(conn: psycopg.Connection) -> None:
 
     # Commit before reporting success; the connection remains open.
     conn.commit()
-    print("DROP TABLE rsvps.")
+    # print("DROP TABLE rsvps.")

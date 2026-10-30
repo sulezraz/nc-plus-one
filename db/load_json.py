@@ -27,4 +27,3 @@ def convert_tuple(data: list[dict]) -> list[tuple]:
 
     return tuple_list
 
-pprint(convert_tuple(load_json("users.json")))

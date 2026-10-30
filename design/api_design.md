@@ -32,7 +32,7 @@ TODO add: add proper implementation of errors found in metrotram booking api
 | :----: | :-----------: | :-------------------: | :------------------------------------------------------------------------- | :----------: | :-------------------------------: |
 | POST | /users | Creates a new user | `username` (str), <br>`email` (str), <br>`password` (str) | 201 Created | 409 Conflict, 422 Unprocessable Entity |
 
-An existing email Return `409 Conflict`. Store a password hash in `user_password`; never return the password or its hash.
+An existing email Return `409 Conflict`. Store a password hash in `password`; never return the password or its hash.
 
 
 ### PATCH

@@ -38,7 +38,7 @@ def get_all_users():
     assert cur.description is not None
 
     # Extract column names from the query metadata.
-    # ["user_id", "username", "email", "user_password", "created_at"]
+    # ["user_id", "username", "email", "password", "created_at"]
     columns = [desc[0] for desc in cur.description]
 
     # Retrieve all rows as a list of tuples, or [] if the table is empty.
@@ -153,7 +153,7 @@ def get_all_users():
 
 Example column names:
 ```python
-["user_id", "username", "email", "user_password", "created_at"]
+["user_id", "username", "email", "password", "created_at"]
 ```
 
 #### Retrieve the rows

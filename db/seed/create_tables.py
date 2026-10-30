@@ -10,7 +10,7 @@ def create_users_table(conn: psycopg.Connection) -> None:
             user_id SERIAL PRIMARY KEY,
             username VARCHAR(255) NOT NULL,
             email VARCHAR(255) UNIQUE NOT NULL,
-            user_password VARCHAR(255) NOT NULL,
+            password VARCHAR(255) NOT NULL,
             created_at TIMESTAMPTZ DEFAULT NOW()
         );
     """
@@ -21,7 +21,7 @@ def create_users_table(conn: psycopg.Connection) -> None:
 
     # Commit before reporting success; the connection remains open.
     conn.commit()
-    print("CREATE TABLE users.")
+    # print("CREATE TABLE users.")
 
 
 def create_venues_table(conn: psycopg.Connection) -> None:
@@ -41,7 +41,7 @@ def create_venues_table(conn: psycopg.Connection) -> None:
 
     # Commit before reporting success; the connection remains open.
     conn.commit()
-    print("CREATE TABLE venues.")
+    # print("CREATE TABLE venues.")
 
 
 def create_events_table(conn: psycopg.Connection) -> None:
@@ -65,7 +65,7 @@ def create_events_table(conn: psycopg.Connection) -> None:
 
     # Commit before reporting success; the connection remains open.
     conn.commit()
-    print("CREATE TABLE events.")
+    # print("CREATE TABLE events.")
 
 
 def create_rsvps_table(conn: psycopg.Connection) -> None:
@@ -85,4 +85,4 @@ def create_rsvps_table(conn: psycopg.Connection) -> None:
 
     # Commit before reporting success; the connection remains open.
     conn.commit()
-    print("CREATE TABLE rsvps.")
+    # print("CREATE TABLE rsvps.")

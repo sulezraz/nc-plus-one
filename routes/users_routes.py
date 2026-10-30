@@ -5,6 +5,7 @@ import sys
 sys.path.insert(0,"/home/suleyman/projects/northcoders/2projects/nc-plus-one")
 
 from fastapi import APIRouter, HTTPException
+from psycopg.errors import UniqueViolation
 from rich.pretty import pprint
 
 from db.connection import get_connection
@@ -79,44 +80,74 @@ def get_user(user_id: int) -> dict[str, dict[str, int]]:
 #------------#
 
 # -- Add a new user -- #
-@users_router.post("/", status_code=201) # Return HTTP 201 Created when the route completes successfully.
+@users_router.post("/", status_code=201)
 def create_user(user: UserCreate) -> dict[str, dict]:
-    
+    """Create and return a user, raising HTTP 409 if a unique value (email) already exists."""
     conn = get_connection()
     cur = conn.cursor()
-    
+
     query = """--sql
         INSERT INTO users (
             username,
             email,
-            user_password
+            password
         )
         VALUES (%s, %s, %s)
         RETURNING *;
     """
 
-    # Pass values separately so the driver handles SQL parameters safely.
-    cur.execute(
-        query,
-        (
-            user.username,
-            user.email,
-            user.user_password,
-        ),
-    )
-    
-    assert cur.description is not None          # CHECK: sql query must return column metadata
-    columns = [desc[0] for desc in cur.description]
-    row = cur.fetchone()
+    try:
+        # Pass values separately so the driver handles SQL parameters safely.
+        cur.execute(
+            query,
+            (
+                user.username,
+                user.email,
+                user.password,
+            ),
+        )
 
-    conn.commit()  # Save the transaction's changes.
-    cur.close()   # Release the cursor
-    conn.close()  # Close the connection
-    
-    assert row is not None
+        # Read column names and the inserted row returned by RETURNING *.
+        assert cur.description is not None
+        columns = [desc[0] for desc in cur.description]
+        row = cur.fetchone()
 
-    posted_user = dict(zip(columns, row))
-    return {"user": posted_user}
+        conn.commit()  # Save the new user.
+
+        assert row is not None
+        # Pair column names with their values to build the response.
+        posted_user = dict(zip(columns, row))
+        return {"user": posted_user}
+
+    except UniqueViolation as e:
+        # Show database error details in the server terminal.
+        print()
+        print("Constraint failed:", e.diag.constraint_name)
+        print("Conflict details:", e.diag.message_detail)
+        print()
+
+        # Return a conflict response to the client, preserving the original cause.
+        raise HTTPException(
+            status_code=409,
+            detail={
+                "Severity": e.diag.severity,
+                "Code Error": "409 Conflict",
+                "Message": e.diag.message_primary,
+                "Detail": e.diag.message_detail,
+                "Table/Field": e.diag.constraint_name,
+
+}
+
+            
+        ) from e
+
+    finally:
+        # Release database resources whether the operation succeeds or fails.
+        cur.close()
+        conn.close()
+
+    
+
 
 
 

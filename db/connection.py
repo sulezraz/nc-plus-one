@@ -1,4 +1,4 @@
-"""Load settings for the selected environment and provide PostgreSQL connections using Psycopg."""
+"""Read the database settings from an environment file and use Psycopg to connect Python to PostgreSQL."""
 
 import os
 from pathlib import Path

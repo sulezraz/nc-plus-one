@@ -4,6 +4,7 @@ from pathlib import Path
 import psycopg  # Connects Python to PostgreSQL
 from dotenv import load_dotenv  # Loads settings from an environment file
 
+# tests/conftest.py sets ENV=test to load .env.test and PGDATABASE=nc_plus_one_test to select the test database. These are set before importing application code so database connections use the test settings.
 
 def get_connection() -> psycopg.Connection:
     """Load environment settings and return a PostgreSQL connection."""

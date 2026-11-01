@@ -1,3 +1,5 @@
+"""Load settings for the selected environment and provide PostgreSQL connections using Psycopg."""
+
 import os
 from pathlib import Path
 

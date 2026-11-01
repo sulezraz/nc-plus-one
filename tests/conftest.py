@@ -1,22 +1,26 @@
-"""Provide test fixtures for database seeding, API clients, and user input data."""
+ """Provide test configuration and fixtures for database seeding and API clients."""
+
+import os
 
 import pytest
 from fastapi.testclient import TestClient
 
-from main import app
-from reset_and_seed_database import seed
-
-# Select the test environment and database before connections are opened.
+# Select test settings before importing code that may open connections.
 os.environ["ENV"] = "test"
 os.environ["PGDATABASE"] = "nc_plus_one_test"
+
+from main import app
+from reset_and_seed_database import seed
 
 # -------------- #
 # -- FIXTURES -- #
 # -------------- #
+
 @pytest.fixture(autouse=True)
 def seed_test_db() -> None:
-    # Reset and seed the configured database before each test in this file.
+    # Reset and seed the test database before each test covered by this conftest.py.
     seed()
+
 
 @pytest.fixture()
 def client() -> TestClient:

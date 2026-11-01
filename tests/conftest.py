@@ -6,6 +6,9 @@ from fastapi.testclient import TestClient
 from main import app
 from reset_and_seed_database import seed
 
+# Select the test environment and database before connections are opened.
+os.environ["ENV"] = "test"
+os.environ["PGDATABASE"] = "nc_plus_one_test"
 
 # -------------- #
 # -- FIXTURES -- #

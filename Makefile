@@ -1,10 +1,5 @@
-#################################################################################
-#
-# Makefile to build the project
-#
-#################################################################################
-
-PROJECT_NAME = de-lambda-deployment
+# ── Project configuration ────────────────────────────────────────
+PROJECT_NAME = REST-API-deployment
 REGION = eu-west-2
 PYTHON_INTERPRETER = python
 WD=$(shell pwd)
@@ -13,7 +8,8 @@ SHELL := /bin/bash
 PROFILE = default
 PIP:=pip
 
-## Create python interpreter environment.
+
+# ── Create the virtual environment and install dependencies ───────
 create-environment:
 	@echo ">>> About to create environment: $(PROJECT_NAME)..."
 	@echo ">>> check python3 version"
@@ -22,58 +18,67 @@ create-environment:
 	)
 	@echo ">>> Setting up venv."
 	( \
-	    $(PYTHON_INTERPRETER) -m venv .venv; \
+		$(PYTHON_INTERPRETER) -m venv .venv; \
 	)
 
-# Define utility variable to help calling Python from the virtual environment
+# Activate the virtual environment for Python commands.
 ACTIVATE_ENV := source .venv/bin/activate
 
-# Execute python related functionalities from within the project's environment
 define execute_in_env
 	$(ACTIVATE_ENV) && $1
 endef
 
-## Build the environment requirements
 requirements: create-environment
 	$(call execute_in_env, $(PIP) install -r ./requirements.txt)
 
-################################################################################################################
-# Set Up
-## Install bandit
+
+# ── Create development and test environment files (overwrites existing files) ──
+create-dev-env:
+	@echo ">>> Creating .env.development for the nc_plus_one database..."
+	echo "PGDATABASE=nc_plus_one" > .env.development
+
+create-test-env:
+	@echo ">>> Creating .env.test for the test nc_plus_one database..."
+	echo "PGDATABASE=nc_plus_one_test" > .env.test
+
+create-envs: create-dev-env create-test-env
+
+
+
+# ── Install development tools: Bandit, Black and coverage ─────────
 bandit:
 	$(call execute_in_env, $(PIP) install bandit)
 
-## Install black
 black:
 	$(call execute_in_env, $(PIP) install black)
 
-## Install coverage
 coverage:
 	$(call execute_in_env, $(PIP) install pytest-cov)
 
-## Set up dev requirements (bandit, black & coverage)
 dev-setup: bandit black coverage
 
-# Build / Run
 
-## Run the security test (bandit)
+# ── Run security scanning and code formatting ────────────────────
 security-test:
 	$(call execute_in_env, bandit -lll */*.py *c/*/*.py)
 
-## Run the black code check
 run-black:
 	$(call execute_in_env, black .)
 
-# ## Run the unit tests
+run-checks: security-test run-black
+
+
+# Create and seed database
+create-db: 
+	$(call execute_in_env, createdb nc_plus_one)
+	$(call execute_in_env, $(PYTHON_INTERPRETER) -m reset_and_seed_database)
+
+# ── Run tests and check code coverage (currently disabled) ─────────
 # unit-test:
-# 	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest -v)
+#	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest -v)
 
-# ## Run the coverage check
 # check-coverage:
-# 	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest --cov=src tests/)
+#	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest --cov=src tests/)
 
-# ## Run all checks
-# run-checks: security-test run-black unit-test check-coverage
+# run-tests: unit-test check-coverage
 
-## Run only security test
-run-checks: security-test

@@ -9,13 +9,19 @@
 - [Technologies used](#technologies-used)
 - [Project structure](#project-structure)
 - [Installation](#installation)
-  - [1. Fork and clone](#1-fork-and-clone)
-  - [2. Create a virtual environment](#2-create-a-virtual-environment)
-  - [3. Install dependencies](#3-install-dependencies)
-  - [4. Configure the database connection](#4-configure-the-database-connection)
-  - [5. Create and seed the database](#5-create-and-seed-the-database)
-  - [6. Start the server](#6-start-the-server)
-  - [7. Run the tests](#7-run-the-tests)
+  - [Part 1: Setup](#part-1-setup)
+    - [1. Fork and clone](#1-fork-and-clone)
+    - [2. Set up with Make](#2-set-up-with-make)
+    - [3. Configure the database connection](#3-configure-the-database-connection)
+  - [Part 2: Create and seed the database](#part-2-create-and-seed-the-database)
+    - [Start PostgreSQL](#start-postgresql)
+    - [Create the database](#create-the-database)
+    - [Seed data](#seed-data)
+    - [Verify the seed data](#verify-the-seed-data)
+  - [Part 3: Start the server](#part-3-start-the-server)
+- [Testing](#testing)
+  - [Test database setup](#test-database-setup)
+  - [Run tests](#run-tests)
 
 ## Overview
 
@@ -44,7 +50,6 @@ The features below describe the API’s intended scope.
 | **Organisers** | Create and update their events |
 | | See who has registered |
 | | View audience statistics for their events |
-
 ## Data stored
 - **Users:** people using the platform.
 - **Venues:** places where events happen.
@@ -71,7 +76,6 @@ Client / frontend ⇄ REST API ⇄ PostgreSQL database
 ```
 
 #### Local request flow
-
 ```text
 Browser / frontend / HTTP client
         ↓ HTTP request
@@ -116,7 +120,6 @@ Client receives the response
 | **pytest** | Automated tests and reusable test fixtures |
 | **TestClient** | Sends requests directly to the application during API tests |
 | **python-dotenv** | Loads local configuration from environment files |
-
 ## Project structure
 
 ### Application and database
@@ -139,6 +142,7 @@ Client receives the response
 - `requests.http`: Stores example HTTP requests for manual endpoint checks using a compatible client or editor extension.
 
 ### Project configuration
+- `Makefile`: Provides commands to create the virtual environment, install dependencies and run development checks.
 - `requirements.txt`: Lists the Python dependencies and their pinned versions, grouped by purpose.
 - `pyproject.toml`: Defines package metadata and setuptools build settings; currently includes `db` and its subpackages.
 - `.gitignore`: Lists local environment files, virtual environments and caches that Git should ignore.
@@ -152,8 +156,9 @@ Client receives the response
 
 These setup instructions assume Ubuntu or Ubuntu running in WSL. After cloning, run project commands from the `nc-plus-one` folder.
 
-### 1. Fork and clone
+### Part 1: Setup
 
+#### 1. Fork and clone
 Open [sulezraz/nc-plus-one](https://github.com/sulezraz/nc-plus-one) and select **Fork** to create a copy under your GitHub account.
 
 Clone your fork, replacing `YOUR_USERNAME` with your GitHub username:
@@ -162,23 +167,20 @@ git clone https://github.com/YOUR_USERNAME/nc-plus-one.git
 cd nc-plus-one
 ```
 
-### 2. Create a virtual environment
+#### 2. Set up with Make
+Run these **from the project's root directory**, in this order:
 ```bash
-python3 -m venv .venv
+make requirements # Create .venv and install the packages in requirements.txt
+make dev-setup    # Install Bandit, Black and pytest-cov for development checks
+make run-checks   # Run the enabled checks (currently Bandit security scanning)
+```
+
+The Make commands activate `.venv` for their own commands. Before running the manual Python commands in the following steps, activate it in your terminal:
+```bash
 source .venv/bin/activate
 ```
 
-### 3. Install dependencies
-
-From the project root, with your virtual environment activated, install the packages listed in `requirements.txt`:
-```bash
-python -m pip install -r requirements.txt
-```
-
-The packages are grouped by purpose using comments. This command installs all groups.
-
-### 4. Configure the database connection
-
+#### 3. Configure the database connection
 Create `.env.development` in the project root:
 ```dotenv
 PGDATABASE=nc_plus_one
@@ -196,7 +198,7 @@ Replace the example values with your local settings. Psycopg reads these `PG...`
 
 Keep files containing credentials out of Git. The repository ignores `.env.*` files.
 
-### 5. Create and seed the database
+### Part 2: Create and seed the database
 
 #### Start PostgreSQL
 For Ubuntu/WSL with PostgreSQL installed locally, start the database service:
@@ -250,7 +252,7 @@ psql -d nc_plus_one \
 
 The displayed columns exclude passwords. Add `-U` and `-h` options if required; `psql` does not load `.env.development` automatically.
 
-### 6. Start the server
+### Part 3: Start the server
 ```bash
 python -m uvicorn main:app --reload
 ```
@@ -258,29 +260,33 @@ Keep this terminal running while using the API. Press `Ctrl+C` to stop the serve
 
 Open the interactive API documentation at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
 
-### 7. Run the tests
-Create a separate test database once:
+## Testing
+
+`make run-tests` runs the tests, but PostgreSQL and the test database must be ready first. Complete the setup below once unless your Make target already handles it.
+
+### Test database setup
+
+With PostgreSQL running, create a separate test database once:
 ```bash
 createdb nc_plus_one_test
 ```
-Use the same PostgreSQL role and host options as above if required.
+
+Use the same PostgreSQL role and host options as in Part 2 if required.
 
 Create `.env.test` in the project root:
 ```dotenv
 PGDATABASE=nc_plus_one_test
 ```
-Add any required `PGUSER`, `PGPASSWORD`, `PGHOST` and `PGPORT` settings for the test database.
 
-`tests/conftest.py` sets `ENV=test` to load `.env.test` and `PGDATABASE=nc_plus_one_test` to select the test database. These are set before importing application or seed code so database connections use the test settings. pytest loads this configuration automatically.
+Add any required `PGUSER`, `PGPASSWORD`, `PGHOST` and `PGPORT` settings for the test database. Keep this file out of Git.
 
-Run all tests from the project root:
+`tests/conftest.py` selects the test environment and database before importing application or seed code. pytest loads this configuration automatically. Test fixtures should reset and seed the test database before tests that require predictable data.
+
+### Run tests
+
+From the project's root directory:
 ```bash
-python -m pytest
+make run-tests # Run the test suite using the Makefile target
 ```
 
-Or run a specific test file:
-```bash
-python -m pytest tests/test_main.py
-```
-
-Test fixtures should reset and seed the test database before tests that require predictable data. **Uvicorn is not required** for `TestClient` tests, but PostgreSQL must be running.
+**PostgreSQL must be running. Uvicorn is not required** for FastAPI `TestClient` tests.

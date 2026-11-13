@@ -28,12 +28,14 @@ jobs:
           python-version: '3.13.15'
 
       - name: Install make
-        run: sudo apt install make -y  # Install Make; -y automatically confirms
-      - name: Install Application Requirements
-        run: make requirements        # Create .venv and install requirements.txt
-      - name: Install Dev Dependencies
-        run: make dev-setup           # Install Bandit, Black and pytest-cov
-      - name: Run Checks
+        run: sudo apt install make -y
+      - name: Create .venv and install requirements.txt
+        run: make requirements
+      - name: Create development and test environment files
+        run: make create-envs
+      - name: Install development tools - Bandit, Black and coverage
+        run: make dev-setup
+      - name: Run security scanning and code formatting
         run: make run-checks          # TODO Currently only runs security check as tests and coverage require PostgreSQL connection
 
   # ── Job 2: check, plan and apply Terraform changes ─────────

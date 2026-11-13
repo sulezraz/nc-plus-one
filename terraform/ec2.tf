@@ -1,3 +1,9 @@
+resource "aws_default_vpc" "default" {
+  tags = {
+    Name = "Default VPC"
+  }
+}
+
 resource "aws_instance" "ec2_instance" {
   ami                    = "ami-0bce970415466784a"
   instance_type          = "t2.micro"

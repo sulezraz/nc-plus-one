@@ -70,6 +70,22 @@ The REST API sits between clients and the PostgreSQL database:
 Client / frontend ⇄ REST API ⇄ PostgreSQL database
 ```
 
+#### Local request flow
+
+```text
+Browser / frontend / HTTP client
+        ↓ HTTP request
+Uvicorn → FastAPI endpoint
+        ↓
+Database connection using settings from .env.development
+        ↓ Psycopg sends a SQL query
+Local PostgreSQL database
+        ↓ Query results
+FastAPI prepares a JSON response
+        ↓
+Client receives the response
+```
+
 ### Components and responsibilities
 
 #### REST API
@@ -187,6 +203,7 @@ For Ubuntu/WSL with PostgreSQL installed locally, start the database service:
 ```bash
 sudo service postgresql start
 ```
+Enter your Ubuntu/WSL password if prompted. No characters will appear as you type—this is normal.
 
 Check that it is accepting connections:
 ```bash
@@ -200,21 +217,18 @@ Create the development database once:
 ```bash
 createdb nc_plus_one
 ```
-
 If it already exists, this reports an error without changing it.
 
-For a specific PostgreSQL role or host, use:
+Optional - For a specific PostgreSQL role or host, use:
 ```bash
 createdb -U your_postgres_user -h localhost nc_plus_one
 ```
-
 `createdb` does not load `.env.development`.
 
 Alternatively, run the database creation script:
 ```bash
 psql -d postgres -f db/create_database.sql
 ```
-
 **Warning:** this script deletes and recreates the database if it already exists.
 
 #### Seed data
@@ -240,25 +254,21 @@ The displayed columns exclude passwords. Add `-U` and `-h` options if required; 
 ```bash
 python -m uvicorn main:app --reload
 ```
+Keep this terminal running while using the API. Press `Ctrl+C` to stop the server.
 
 Open the interactive API documentation at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
 
-Keep this terminal running while using the API. Press `Ctrl+C` to stop the server.
-
 ### 7. Run the tests
-
 Create a separate test database once:
 ```bash
 createdb nc_plus_one_test
 ```
-
 Use the same PostgreSQL role and host options as above if required.
 
 Create `.env.test` in the project root:
 ```dotenv
 PGDATABASE=nc_plus_one_test
 ```
-
 Add any required `PGUSER`, `PGPASSWORD`, `PGHOST` and `PGPORT` settings for the test database.
 
 `tests/conftest.py` sets `ENV=test` to load `.env.test` and `PGDATABASE=nc_plus_one_test` to select the test database. These are set before importing application or seed code so database connections use the test settings. pytest loads this configuration automatically.

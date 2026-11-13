@@ -1,4 +1,4 @@
- """Provide test configuration and fixtures for database seeding and API clients."""
+"""Provide test configuration and fixtures for database seeding and API clients."""
 
 import os
 

@@ -1,0 +1,29 @@
+name: de-lambda-deployment
+
+on:                          # Events that can start this workflow
+  push:                      # Start automatically when commits are pushed
+    branches:
+      - main                 # Only for pushes to main, including pull request merges
+
+  workflow_dispatch:         # Also allow manual runs using "Run workflow"
+    inputs:                  # Inputs available when starting manually
+      environment:           # Input named "environment"
+        type: string         # Accept a text value
+        default: dev         # Default to "dev" for manual runs
+        required: false      # Providing a value is optional
+
+
+jobs:
+  run-tests:                       # Job ID
+    name: run-tests                # Name shown in GitHub
+    runs-on: ubuntu-latest         # Use a GitHub-hosted Ubuntu machine
+      
+    steps:
+      - name: Checkout Repo        # Label for this step
+        uses: actions/checkout@v3  # Use version 3 of GitHub's checkout action
+
+      - name: Use Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13.15'
+

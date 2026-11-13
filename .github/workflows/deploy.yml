@@ -9,14 +9,13 @@ on:                          # Events that can start this workflow
     inputs:                  # Inputs available when starting manually
       environment:           # Input named "environment"
         type: string         # Accept a text value
-        default: development         # Default to "development" for manual runs
+        default: development  # Default to "development" for manual runs
         required: false      # Providing a value is optional
 
-
 jobs:
-  run-tests:                       # Job ID
-    name: run-tests                # Name shown in GitHub
-    runs-on: ubuntu-latest         # Use a GitHub-hosted Ubuntu machine
+  code-checks:                    # Job ID
+    name: Code checks             # Name shown in GitHub
+    runs-on: ubuntu-latest        # Use a GitHub-hosted Ubuntu machine
       
     steps:
       - name: Checkout Repo        # Label for this step
@@ -44,7 +43,7 @@ jobs:
     name: deploy-dev            # Label displayed in GitHub Actions
     runs-on: ubuntu-latest      # Use a separate Ubuntu runner
     environment: development    # Use dev environment secrets and protection rules
-    needs: run-tests            # Start only after run-tests succeeds
+    needs: code-checks          # Start only after code-checks succeeds
 
 
     # ── Working directory for shell commands ────────────────

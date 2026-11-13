@@ -1,7 +1,7 @@
 ###--------------IMPORTS--------------###
 import sys
 
-sys.path.insert(0,"/home/suleyman/projects/northcoders/2projects/nc-plus-one")
+sys.path.insert(0, "/home/suleyman/projects/northcoders/2projects/nc-plus-one")
 
 from fastapi import status
 from fastapi.testclient import TestClient
@@ -50,7 +50,7 @@ from rich.pretty import pprint
 #     assert list(venues[0].keys()) == ['venue_id', 'venue_name', 'address', 'capacity']
 #     assert isinstance(venues, list)
 #     assert isinstance(venues[0], dict)
-    
+
 # def test_GET_rsvps_returns_with_status_200_and_json_content(client: TestClient) -> None:
 #     rsvps = client.get("/rsvps")
 #     assert rsvps.status_code == status.HTTP_200_OK
@@ -67,6 +67,3 @@ from rich.pretty import pprint
 
 
 # # -- POST -- #
-
-
-

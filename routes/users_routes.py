@@ -2,7 +2,7 @@
 # Defines users endpoints, such as GET /users/, and the functions that handle their requests.
 import sys
 
-sys.path.insert(0,"/home/suleyman/projects/northcoders/2projects/nc-plus-one")
+sys.path.insert(0, "/home/suleyman/projects/northcoders/2projects/nc-plus-one")
 
 from fastapi import APIRouter, HTTPException
 from psycopg.errors import UniqueViolation
@@ -14,9 +14,10 @@ from models.pydantic_models import UserCreate, UserUpdate
 users_router = APIRouter(prefix="/users")
 
 
-#-----------#
-# -- GET -- # 
-#-----------#
+# -----------#
+# -- GET -- #
+# -----------#
+
 
 # -- Return a list of users
 #       Order by username ASC -- #
@@ -69,15 +70,18 @@ def get_user(user_id: int) -> dict[str, dict[str, int]]:
     conn.close()
 
     if row is None:
-        raise HTTPException(status_code=404, detail="Member not found. Are you sure they're real.")
+        raise HTTPException(
+            status_code=404, detail="Member not found. Are you sure they're real."
+        )
 
     user = dict(zip(columns, row))
     return {"user": user}
 
 
-#------------#
-# -- POST -- # 
-#------------#
+# ------------#
+# -- POST -- #
+# ------------#
+
 
 # -- Add a new user -- #
 @users_router.post("/", status_code=201)
@@ -135,23 +139,13 @@ def create_user(user: UserCreate) -> dict[str, dict]:
                 "Message": e.diag.message_primary,
                 "Detail": e.diag.message_detail,
                 "Table/Field": e.diag.constraint_name,
-
-}
-
-            
+            },
         ) from e
 
     finally:
         # Release database resources whether the operation succeeds or fails.
         cur.close()
         conn.close()
-
-    
-
-
-
-
-
 
 
 # # -- MANUAL RESPONSE INSPECTION -- #

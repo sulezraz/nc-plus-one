@@ -26,4 +26,3 @@ def convert_tuple(data: list[dict]) -> list[tuple]:
         tuple_list.append(tuple(dict_data.values()))
 
     return tuple_list
-

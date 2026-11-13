@@ -1,7 +1,6 @@
 # /reset_and_seed_database.py
 # Recreates the application tables and populates them with initial JSON seed data.
 
-
 from db.connection import get_connection
 from db.seed.create_tables import (
     create_events_table,
@@ -24,29 +23,32 @@ from db.seed.seed_tables import (
 
 conn = get_connection()
 
+
 def seed():
-    ##### DROP TABLES #####
+    # DROP TABLES
     drop_users_table(conn)
-    drop_venues_table(conn)    
-    drop_events_table(conn) # Create events after the users and venues tables it references.
-    drop_rsvps_table(conn)  # Create RSVPs after the users and events tables it references.
+    drop_venues_table(conn)
+    drop_events_table(conn)
+    drop_rsvps_table(conn)
     print()
 
-
-    ##### CREATE TABLES #####
+    # CREATE TABLES
     create_users_table(conn)
     create_venues_table(conn)
-    create_events_table(conn) # Create events after the users and venues tables it references.
-    create_rsvps_table(conn)  # Create RSVPs after the users and events tables it references.
+    # Create events after the users and venues tables it references.
+    create_events_table(conn)
+    # Create RSVPs after the users and events tables it references.
+    create_rsvps_table(conn)
     print()
 
-
-    ##### INSERT INITIAL DATA #####
+    # INSERT INITIAL DATA
     # Insert users and venues before events that reference their IDs.
     insert_users_table(conn)
     insert_venues_table(conn)
     insert_events_table(conn)
-    insert_rsvps_table(conn) # Insert RSVPs after the users and events they reference.
+
+    # Insert RSVPs after the users and events they reference.
+    insert_rsvps_table(conn)
     print()
 
 
@@ -54,6 +56,4 @@ if __name__ == "__main__":
     seed()
 
 
-
 # TODO: Build data-transformation utilities using TDD.
-

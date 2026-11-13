@@ -9,7 +9,8 @@ from models.pydantic_models import RsvpCreate, RsvpUpdate
 rsvps_router = APIRouter(prefix="/rsvps")
 
 
-# -- GET -- # 
+# -- GET -- #
+
 
 # -- Return a list of event registrations
 #       Order by created_at ASC -- #
@@ -62,23 +63,28 @@ def get_rsvps(rsvp_id: int) -> dict[str, dict]:
     conn.close()
 
     if row is None:
-        raise HTTPException(status_code=404, detail="rsvp not found. Did you check the bin.")
+        raise HTTPException(
+            status_code=404, detail="rsvp not found. Did you check the bin."
+        )
 
     rsvp = dict(zip(columns, row))
     return {"rsvp": rsvp}
 
 
-#------------#
-# -- POST -- # 
-#------------#
+# ------------#
+# -- POST -- #
+# ------------#
+
 
 # -- Add a new rsvp -- #
-@rsvps_router.post("/", status_code=201) # Return HTTP 201 Created when the route completes successfully.
+@rsvps_router.post(
+    "/", status_code=201
+)  # Return HTTP 201 Created when the route completes successfully.
 def create_rsvp(rsvp: RsvpCreate) -> dict[str, dict]:
-    
+
     conn = get_connection()
     cur = conn.cursor()
-    
+
     query = """--sql
         INSERT INTO rsvps (
             attendee_id,
@@ -96,22 +102,19 @@ def create_rsvp(rsvp: RsvpCreate) -> dict[str, dict]:
             rsvp.event_id,
         ),
     )
-    
-    assert cur.description is not None          # CHECK: sql query must return column metadata
+
+    assert cur.description is not None  # CHECK: sql query must return column metadata
     columns = [desc[0] for desc in cur.description]
     row = cur.fetchone()
 
     conn.commit()  # Save the transaction's changes.
-    cur.close()   # Release the cursor
+    cur.close()  # Release the cursor
     conn.close()  # Close the connection
-    
+
     assert row is not None
-    
+
     posted_rsvp = dict(zip(columns, row))
     return {"rsvp": posted_rsvp}
-
-
-
 
 
 # # -- MANUAL RESPONSE INSPECTION -- #

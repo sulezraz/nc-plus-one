@@ -22,7 +22,6 @@ app.include_router(events_router)
 app.include_router(rsvps_router)
 
 
-
 @app.exception_handler(HTTPException)
 def handle_http_exception(request: Request, exc: HTTPException):
     print(f"==>> {JSONResponse = !r}")

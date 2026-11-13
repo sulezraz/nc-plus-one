@@ -9,9 +9,10 @@ from models.pydantic_models import VenueCreate, VenueUpdate
 
 venues_router = APIRouter(prefix="/venues")
 
-#-----------#
-# -- GET -- # 
-#-----------#
+# -----------#
+# -- GET -- #
+# -----------#
+
 
 # -- Return a list of venues
 #       Order by venue id ASC -- #
@@ -26,9 +27,9 @@ def get_all_venues() -> dict[str, list[dict]]:
         ORDER BY venue_id, venue_name;
     """)
 
-    assert cur.description is not None     # checks that column metadata is available
+    assert cur.description is not None  # checks that column metadata is available
     columns = [desc[0] for desc in cur.description]
-    rows = cur.fetchall()           # fetchall() returns [] when no rows match.
+    rows = cur.fetchall()  # fetchall() returns [] when no rows match.
 
     cur.close()
     conn.close()
@@ -40,10 +41,9 @@ def get_all_venues() -> dict[str, list[dict]]:
     return {"venues": venues}
 
 
-
-# TODO: **FILTER: Return venues under/over a certain capacity**. 
-# Filter by: `min_capacity`, `max_capacity`; either may be omitted. 
-# Boundaries are inclusive, and minimum must not exceed maximum. 
+# TODO: **FILTER: Return venues under/over a certain capacity**.
+# Filter by: `min_capacity`, `max_capacity`; either may be omitted.
+# Boundaries are inclusive, and minimum must not exceed maximum.
 # Venues with null capacity do not match capacity filters.
 
 
@@ -52,7 +52,7 @@ def get_all_venues() -> dict[str, list[dict]]:
 def get_venue(venue_id: int) -> dict[str, dict]:
     conn = get_connection()
     cur = conn.cursor()
-    
+
     query = """--sql
         SELECT *
         FROM venues
@@ -61,32 +61,35 @@ def get_venue(venue_id: int) -> dict[str, dict]:
 
     # Pass values separately so the driver handles SQL parameters safely.
     cur.execute(query, (venue_id,))
-    
+
     assert cur.description is not None
     columns = [desc[0] for desc in cur.description]
     row = cur.fetchone()
-    
+
     cur.close()
     conn.close()
 
-    if not row:     # if nothing is returned from SQL query then raise Exception
+    if not row:  # if nothing is returned from SQL query then raise Exception
         raise HTTPException(status_code=404, detail="Venue not found. That's worrying.")
 
     venue = dict(zip(columns, row))
     return {"venue": venue}
 
 
-#------------#
-# -- POST -- # 
-#------------#
+# ------------#
+# -- POST -- #
+# ------------#
+
 
 # -- Add a new venue -- #
-@venues_router.post("/", status_code=201) # Return HTTP 201 Created when the route completes successfully.
+@venues_router.post(
+    "/", status_code=201
+)  # Return HTTP 201 Created when the route completes successfully.
 def create_venue(venue: VenueCreate) -> dict[str, dict]:
-    
+
     conn = get_connection()
     cur = conn.cursor()
-    
+
     query = """--sql
         INSERT INTO venues (
             venue_name,
@@ -106,23 +109,19 @@ def create_venue(venue: VenueCreate) -> dict[str, dict]:
             venue.capacity,
         ),
     )
-    
-    assert cur.description is not None          # CHECK: sql query must return column metadata
+
+    assert cur.description is not None  # CHECK: sql query must return column metadata
     columns = [desc[0] for desc in cur.description]
     row = cur.fetchone()
 
     conn.commit()  # Save the transaction's changes.
-    cur.close()   # Release the cursor
+    cur.close()  # Release the cursor
     conn.close()  # Close the connection
-    
+
     assert row is not None
-    
+
     posted_venue = dict(zip(columns, row))
     return {"venue": posted_venue}
-
-
-
-
 
 
 # # -- MANUAL RESPONSE INSPECTION -- #

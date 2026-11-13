@@ -16,6 +16,7 @@ from reset_and_seed_database import seed
 # -- FIXTURES -- #
 # -------------- #
 
+
 @pytest.fixture(autouse=True)
 def seed_test_db() -> None:
     # Reset and seed the test database before each test covered by this conftest.py.
@@ -27,10 +28,12 @@ def client() -> TestClient:
     # Create a fresh test client for each test that requests it.
     return TestClient(app)
 
+
 # -------------- #
 
 
 # -- DATA -- #
+
 
 @pytest.fixture
 def user_valid_dict():
@@ -46,5 +49,5 @@ def users_duplicate_email():
     return {
         "username": "Suleyman Rasul",
         "email": "chacna@example.com",
-        "password": "password123"
+        "password": "password123",
     }

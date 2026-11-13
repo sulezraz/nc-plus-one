@@ -3,7 +3,7 @@
 import sys
 from datetime import datetime
 
-sys.path.insert(0,"/home/suleyman/projects/northcoders/2projects/nc-plus-one")
+sys.path.insert(0, "/home/suleyman/projects/northcoders/2projects/nc-plus-one")
 
 from fastapi import APIRouter, HTTPException
 from rich.pretty import pprint
@@ -13,9 +13,10 @@ from models.pydantic_models import EventCreate, EventUpdate
 
 events_router = APIRouter(prefix="/events")
 
-#-----------#
-# -- GET -- # 
-#-----------#
+# -----------#
+# -- GET -- #
+# -----------#
+
 
 # -- Return a list of events
 #       Order by event_name ASC -- #
@@ -48,7 +49,7 @@ def get_all_events() -> dict[str, list[dict]]:
 # -- Returns a single event by ID -- #
 @events_router.get("/{event_id}")
 def get_event(event_id: int) -> dict[str, dict]:
-    
+
     conn = get_connection()
     cur = conn.cursor()
 
@@ -69,24 +70,28 @@ def get_event(event_id: int) -> dict[str, dict]:
     conn.close()
 
     if row is None:
-        raise HTTPException(status_code=404, detail="Event not found. Did you check the bin.")
+        raise HTTPException(
+            status_code=404, detail="Event not found. Did you check the bin."
+        )
 
     event = dict(zip(columns, row))
     return {"event": event}
 
 
+# ------------#
+# -- POST -- #
+# ------------#
 
-#------------#
-# -- POST -- # 
-#------------#
 
 # -- Add a new event -- #
-@events_router.post("/", status_code=201) # Return HTTP 201 Created when the route completes successfully.
+@events_router.post(
+    "/", status_code=201
+)  # Return HTTP 201 Created when the route completes successfully.
 def create_event(event: EventCreate) -> dict[str, dict]:
-    
+
     conn = get_connection()
     cur = conn.cursor()
-    
+
     query = """--sql
         INSERT INTO events (
             event_name,
@@ -112,24 +117,19 @@ def create_event(event: EventCreate) -> dict[str, dict]:
             event.venue_id,
         ),
     )
-    
-    assert cur.description is not None          # CHECK: sql query must return column metadata
+
+    assert cur.description is not None  # CHECK: sql query must return column metadata
     columns = [desc[0] for desc in cur.description]
     row = cur.fetchone()
 
     conn.commit()  # Save the transaction's changes.
-    cur.close()   # Release the cursor
+    cur.close()  # Release the cursor
     conn.close()  # Close the connection
-    
+
     assert row is not None
 
     posted_event = dict(zip(columns, row))
     return {"event": posted_event}
-
-
-
-
-
 
 
 # # -- MANUAL RESPONSE INSPECTION -- #

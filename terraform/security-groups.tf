@@ -1,13 +1,9 @@
-# Look up the default VPC in the configured AWS region.
-data "aws_vpc" "default" {
-  default = true
-}
 
 # Create the security group in that VPC.
 resource "aws_security_group" "allow_ssh" {
   name        = "allow_ssh"
   description = "Allow SSH, HTTP from a specified IP, and outbound IPv4 traffic"
-  vpc_id      = data.aws_vpc.default.id
+  vpc_id      = aws_default_vpc.default.id
 
   tags = {
     Name = "allow_ssh"

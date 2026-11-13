@@ -1,4 +1,4 @@
-name: de-lambda-deployment
+name: REST-API-deployment
 
 on:                          # Events that can start this workflow
   push:                      # Start automatically when commits are pushed
@@ -9,7 +9,7 @@ on:                          # Events that can start this workflow
     inputs:                  # Inputs available when starting manually
       environment:           # Input named "environment"
         type: string         # Accept a text value
-        default: dev         # Default to "dev" for manual runs
+        default: development         # Default to "development" for manual runs
         required: false      # Providing a value is optional
 
 
@@ -20,7 +20,7 @@ jobs:
       
     steps:
       - name: Checkout Repo        # Label for this step
-        uses: actions/checkout@v3  # Use version 3 of GitHub's checkout action
+        uses: actions/checkout@v4  # Use version 4 of GitHub's checkout action
 
       - name: Use Python
         uses: actions/setup-python@v4
@@ -38,10 +38,10 @@ jobs:
 
   # ── Job 2: check, plan and apply Terraform changes ─────────
   # Runs after successful tests and applies changes without an approval prompt.
-  deploy-lambda-dev:             # Job ID
+  REST-API-deployment-dev:             # Job ID
     name: deploy-dev            # Label displayed in GitHub Actions
     runs-on: ubuntu-latest      # Use a separate Ubuntu runner
-    environment: development            # Use dev environment secrets and protection rules
+    environment: development    # Use dev environment secrets and protection rules
     needs: run-tests            # Start only after run-tests succeeds
 
 
@@ -51,18 +51,14 @@ jobs:
       run:
         working-directory: ${{ vars.TF_ACTIONS_WORKING_DIR }}     # Set the GitHub variable TF_ACTIONS_WORKING_DIR to terraform/
 
-
     # ── GitHub token permissions ────────────────────────────
     permissions:
       contents: read            # Allow checkout to read repository files
 
-
     steps:
       # ── Download the project's files onto this runner ─────
       - name: Checkout Repo
-        uses: actions/checkout@v3  # Version 3 of the checkout action
-        with:
-          repository: sulezraz/de-lambda-deployment  # Optional for the workflow's own repository
+        uses: actions/checkout@v4  # Version 4 of the checkout action
 
 
       # ── Install Terraform CLI ────────────────────────────

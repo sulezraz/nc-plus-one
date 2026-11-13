@@ -35,3 +35,84 @@ jobs:
         run: make dev-setup           # Install Bandit, Black and pytest-cov
       - name: Run Checks
         run: make run-checks          # TODO Currently only runs security check as tests and coverage require PostgreSQL connection
+
+  # ── Job 2: check, plan and apply Terraform changes ─────────
+  # Runs after successful tests and applies changes without an approval prompt.
+  deploy-lambda-dev:             # Job ID
+    name: deploy-dev            # Label displayed in GitHub Actions
+    runs-on: ubuntu-latest      # Use a separate Ubuntu runner
+    environment: development            # Use dev environment secrets and protection rules
+    needs: run-tests            # Start only after run-tests succeeds
+
+
+    # ── Working directory for shell commands ────────────────
+    # Applies to run: commands, not uses: actions such as checkout.
+    defaults:
+      run:
+        working-directory: ${{ vars.TF_ACTIONS_WORKING_DIR }}     # Set the GitHub variable TF_ACTIONS_WORKING_DIR to terraform/
+
+
+    # ── GitHub token permissions ────────────────────────────
+    permissions:
+      contents: read            # Allow checkout to read repository files
+
+
+    steps:
+      # ── Download the project's files onto this runner ─────
+      - name: Checkout Repo
+        uses: actions/checkout@v3  # Version 3 of the checkout action
+        with:
+          repository: sulezraz/de-lambda-deployment  # Optional for the workflow's own repository
+
+
+      # ── Install Terraform CLI ────────────────────────────
+      # Makes the terraform command available to subsequent steps.
+      - name: Terraform Installation
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: "1.17.2"  # Terraform CLI version to install
+
+
+      # ── Configure AWS access before initialising S3 state ─
+      # Later commands in this job use these credentials to access AWS.
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v6.3.0
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}          # AWS access key ID
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # Corresponding secret key
+          aws-region: ${{ secrets.AWS_REGION }}                       # Target AWS region
+
+
+      # ── Initialise Terraform ─────────────────────────────
+      # Configure the backend and install required providers/modules.
+      - name: Terraform Init
+        id: init                # Step ID for later status/output references
+        run: terraform init -input=false  # Disable interactive prompts
+
+
+      # ── Check formatting ─────────────────────────────────
+      # Fail if formatting changes are needed; fix locally, commit and push.
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check  # Check formatting without modifying files
+
+
+      # ── Validate the Terraform configuration ──────────────
+      # Check syntax and internal consistency without deploying resources.
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color  # Remove terminal colour codes
+
+
+      # ── Preview proposed infrastructure changes ──────────
+      # Display the plan without changing infrastructure or saving a plan file.
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color -input=false  # Plain output; disable interactive prompts
+
+
+      # ── Apply infrastructure changes ─────────────────────
+      # Generate a fresh plan and apply it; resources may be created, updated or deleted.
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply -no-color -auto-approve  # Plain output; skip Terraform's approval prompt

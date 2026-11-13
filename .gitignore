@@ -39,3 +39,8 @@ crash.*.log
 # SSH private keys
 *.pem
 *.key
+
+# Generated Python packaging files
+*.egg-info/
+build/
+dist/

@@ -27,3 +27,11 @@ jobs:
         with:
           python-version: '3.13.15'
 
+      - name: Install make
+        run: sudo apt install make -y  # Install Make; -y automatically confirms
+      - name: Install Application Requirements
+        run: make requirements        # Create .venv and install requirements.txt
+      - name: Install Dev Dependencies
+        run: make dev-setup           # Install Bandit, Black and pytest-cov
+      - name: Run Checks
+        run: make run-checks          # Run security, formatting, tests and coverage

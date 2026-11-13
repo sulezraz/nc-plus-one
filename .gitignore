@@ -1,11 +1,41 @@
 # Virtual environments
-venv
-.venv
+venv/
+.venv/
 
 # Python caches
-__pycache__
+__pycache__/
 *.pyc
 
 # pytest cache
-.pytest_cache
+.pytest_cache/
+
+# Environment files
+.env
 .env.*
+
+# Terraform downloaded providers and modules
+.terraform/
+*.terraform/*
+**/.terraform*
+terraform/init.sh
+
+# Terraform state, backups and temporary state lock
+*.tfstate
+*.tfstate.*
+.terraform.tfstate.lock.info
+
+# Terraform variable files — may contain credentials
+*.tfvars
+*.tfvars.json
+
+# Saved Terraform plans — may contain sensitive values
+*.tfplan
+tfplan
+
+# Terraform crash logs
+crash.log
+crash.*.log
+
+# SSH private keys
+*.pem
+*.key

@@ -35,20 +35,15 @@ def seed():
     # CREATE TABLES
     create_users_table(conn)
     create_venues_table(conn)
-    # Create events after the users and venues tables it references.
-    create_events_table(conn)
-    # Create RSVPs after the users and events tables it references.
-    create_rsvps_table(conn)
+    create_events_table(conn)   # Create events after the users and venues tables it references. # fmt: skip
+    create_rsvps_table(conn)   # Create RSVPs after the users and events tables it references. # fmt: skip
     print()
 
     # INSERT INITIAL DATA
-    # Insert users and venues before events that reference their IDs.
-    insert_users_table(conn)
+    insert_users_table(conn)  # Insert users and venues before events that reference their IDs. # fmt: skip
     insert_venues_table(conn)
     insert_events_table(conn)
-
-    # Insert RSVPs after the users and events they reference.
-    insert_rsvps_table(conn)
+    insert_rsvps_table(conn)  # Insert RSVPs after the users and events they reference. # fmt: skip
     print()
 
 

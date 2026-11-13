@@ -34,4 +34,4 @@ jobs:
       - name: Install Dev Dependencies
         run: make dev-setup           # Install Bandit, Black and pytest-cov
       - name: Run Checks
-        run: make run-checks          # Run security, formatting, tests and coverage
+        run: make run-checks          # TODO Currently only runs security check as tests and coverage require PostgreSQL connection
